@@ -30,8 +30,8 @@ class PatchworkControllerPvAI():
 		self.ai = PatchworkAI()
 
 		#TESTING
-		self.model.p1.position = 17
-		self.model.p2.position = 17
+		#self.model.p1.position = 17
+		#self.model.p2.position = 17
 
 		self.clock = pygame.time.Clock()
 		pygame.display.set_caption("TEST TEST TEST")
