@@ -6,7 +6,7 @@ import pygame
 class Player():
 
 	def __init__(self, player_num):
-		self.buttons = 0
+		self.buttons = 5
 		self.position = 0 #this is a bad name
 		self.player_num = player_num
 		self.quilt = QuiltBoard()
@@ -62,21 +62,28 @@ class Player():
 
 		return passed_patch
 
+	#TODO: algorithm to check if the patch will fit on the board anywhere
+	def can_buy(self, patch):
+		return patch.cost <= self.buttons
+
+
+	#returns value of move to see if a 1x1 patch was passed
 	def buy_patch(self, patch, time_track, other_player):
 		if patch.cost > self.buttons:
 			#raise Exception("Not enough buttons")
-			print("Not enough buttons")
-			return
+			return None
 		else:
 			self.buttons -= patch.cost
-			self.move(patch.time_cost, time_track, other_player)
+			return self.move(patch.time_cost, time_track, other_player)
 
 	def place_patch(self, patch, row, col):
 		if not self.quilt.valid_placement(patch, row, col):
-			print ("invalid placement")
-			return
+			return None
 		else:
 			self.quilt.place_patch(patch, row, col)
+
+	def can_place(self, patch, row, col):
+		return self.quilt.valid_placement(patch, row, col)
 
 	#jump to other player (move one past that player and gain the distance moved as income)
 	#returns value of move to be used to check if patch placement is needed
@@ -89,7 +96,7 @@ class Player():
 
 		self.buttons += distance
 
-		return self.move(distance, time_track, other_player)
+		self.move(distance, time_track, other_player)
 
 	def update_order(self, on_top):
 		self.on_top = on_top
@@ -113,7 +120,6 @@ class Player():
 	#render board when it is the unfocused board (not the current player)
 	def render_board_secondary(self, surface, x, y):
 		self.quilt.render_secondary(surface, x, y, self.buttons)
-
 
 
 

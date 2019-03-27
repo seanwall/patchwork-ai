@@ -22,7 +22,7 @@ class Patch():
 		self.orientation = rotated_shape
 
 	#renders patch onto the given surface with the upper left hand corner starting at x,y
-	def render(self, surface, x, y):
+	def render_buy_list(self, surface, x, y):
 		
 		pygame.font.init()
 
@@ -42,3 +42,13 @@ class Patch():
 			for col in range(len(self.shape[row])):
 				if self.shape[row][col] == 1:
 					pygame.draw.rect(surface, (255, 255, 255), [x + (square_width*col), y + (square_width*row), square_width - 1, square_width - 1])
+
+	#renders patch onto the given surface with the upper left hand corner starting at x,y
+	def render_placement(self, surface, x, y, color):
+		square_width = int(surface.get_width()/9)
+
+		for row in range(len(self.orientation)):
+			for col in range(len(self.orientation[row])):
+				if self.orientation[row][col] == 1:
+					pygame.draw.rect(surface, color, [(x*square_width) + (square_width*col), (y*square_width) + (square_width*row), square_width - 1, square_width - 1])
+

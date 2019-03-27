@@ -10,6 +10,8 @@ from model.Player import Player
 from model.QuiltBoard import QuiltBoard
 from model.TimeTrack import TimeTrack
 from model.TrackTile import TrackTile
+from model.Turn import BuyTurn
+from model.Turn import JumpTurn
 
 class PatchworkModel():
 	PATCH_LIST_CONST = []
@@ -46,9 +48,81 @@ class PatchworkModel():
 		else:
 			return 0
 
+	#return player.buy_patch to see if a patch was passed in the move
+	def buy_patch(self, patch_idx):
+		if self.p1_turn():
+			player = self.p1
+			other_player = self.p2
+		else:
+			player = self.p2
+			other_player = self.p1
+
+		if player.can_buy(self.patch_list[patch_idx]):
+			patch = self.patch_list[patch_idx]
+			#remove patch from patch list if it is purchased
+			#temp_list = PatchworkModel.patch_list.copy()
+			del self.patch_list[patch_idx]
+			self.patch_list.rotate(-patch_idx)
+
+			player.buy_patch(patch, self.time_track, other_player)
+
+	def place_patch(self, patch, row, col):
+		if self.p1_turn():
+			player = self.p1
+		else:
+			player = self.p2
+
+		player.place_patch(patch, row, col)
+
+	def can_buy(self, patch_idx):
+		if self.p1_turn():
+			player = self.p1
+		else:
+			player = self.p2
+
+		return player.can_buy(self.patch_list[patch_idx])
+
+	def can_place(self, patch, row, col):
+		if self.p1_turn():
+			player = self.p1
+		else:
+			player = self.p2
+
+		return player.can_place(patch, row, col)
+
+	#return player.jump value to see if a patch was passed
+	def jump(self):
+		if self.p1_turn():
+			player = self.p1
+			other_player = self.p2
+		else:
+			player = self.p2
+			other_player = self.p1
+
+		return player.jump(self.time_track, other_player)
+
 	#returns True if p1 turn, False if p2 turn
 	def p1_turn(self):
 		return (self.p1.position < self.p2.position) or ((self.p1.position == self.p2.position) and self.p1.on_top == True)
+
+	#return valid turns for the current model
+	def get_turns(self):
+		if self.p1_turn():
+			player = self.p1
+			other_player = self.p2
+		else:
+			player = self.p2
+			other_player = self.p1
+
+		turns = []
+
+		for i in range(3):
+			if self.can_buy(i):
+				turns.append(BuyTurn(i))
+
+		turns.append(JumpTurn())
+
+		return turns
 
 	#builds a list of the patches in patchwork
 	def build_patch_list(self):

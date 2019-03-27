@@ -3,6 +3,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import unittest
+from collections import deque
 
 from model.TimeTrack import TimeTrack
 from model.TrackTile import TrackTile
@@ -10,6 +11,8 @@ from model.QuiltBoard import QuiltBoard
 from model.Patch import Patch
 from model.Player import Player
 from model.PatchworkModel import PatchworkModel
+from model.Turn import BuyTurn
+from model.Turn import JumpTurn
 
 class TestTimeTrackMethods(unittest.TestCase):
 
@@ -124,39 +127,39 @@ class TestPlayerMethods(unittest.TestCase):
 		p1.move(4, track, p2)
 
 		self.assertEqual(p1.position, 4)
-		self.assertEqual(p1.buttons, 0)
+		self.assertEqual(p1.buttons, 5)
 
 		p1.move(1, track, p2)
 
 		self.assertEqual(p1.position, 5)
-		self.assertEqual(p1.buttons, 3)
+		self.assertEqual(p1.buttons, 8)
 
 		no_tile = p1.move(14, track, p2)
 
 		self.assertEqual(p1.position, 19)
-		self.assertEqual(p1.buttons, 9)
+		self.assertEqual(p1.buttons, 14)
 		self.assertEqual(no_tile, False)
 
 		tile = p1.move(1, track, p2)
 
 		self.assertEqual(p1.position, 20)
-		self.assertEqual(p1.buttons, 9)
+		self.assertEqual(p1.buttons, 14)
 		self.assertEqual(tile, True)
 
 		p1.move(32, track, p2)
 
 		self.assertEqual(p1.position, 52)
-		self.assertEqual(p1.buttons, 24)
+		self.assertEqual(p1.buttons, 29)
 
 		p1.move(1, track, p2)
 
 		self.assertEqual(p1.position, 53)
-		self.assertEqual(p1.buttons, 27)
+		self.assertEqual(p1.buttons, 32)
 
 		p1.move(2, track, p2)
 
 		self.assertEqual(p1.position, 53)
-		self.assertEqual(p1.buttons, 27)
+		self.assertEqual(p1.buttons, 32)
 
 
 	def test_player_move_overshoot(self):
@@ -248,14 +251,14 @@ class TestPlayerMethods(unittest.TestCase):
 		p1.jump(track, p2)
 
 		self.assertEqual(p1.position, 4)
-		self.assertEqual(p1.buttons, 4)
+		self.assertEqual(p1.buttons, 9)
 
 		p2.position = 5
 
 		self.assertEqual(p1.jump(track, p2), False)
 
 		self.assertEqual(p1.position, 6)
-		self.assertEqual(p1.buttons, 9)
+		self.assertEqual(p1.buttons, 14)
 
 		p2.position = 19
 
@@ -321,6 +324,15 @@ class TestModelMethods(unittest.TestCase):
 		model.p1.on_top = False
 		model.p2.on_top = True
 		self.assertEqual(model.p1_turn(), False)
+
+	def test_get_moves(self):
+		model = PatchworkModel()
+		model.patch_list = deque(model.build_patch_list())
+		self.assertIsInstance(model.get_turns()[0], BuyTurn)
+		self.assertEqual(model.get_turns()[0].patch_idx, 1)
+		self.assertIsInstance(model.get_turns()[1], BuyTurn)
+		self.assertEqual(model.get_turns()[1].patch_idx, 2)
+		self.assertIsInstance(model.get_turns()[2], JumpTurn)
 
 
 if __name__ == '__main__':

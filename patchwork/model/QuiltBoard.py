@@ -60,7 +60,7 @@ class QuiltBoard():
 
 	#TODO: THIS IS BAD, NEED BETTER VIEW HANDLING PASSING EVERYTHING AROUND IS MESSY
 	def render_primary(self, surface, x, y, button_count):
-		square_width = int(surface.get_width()/20)
+		square_width = int(surface.get_width()/9)
 
 		pygame.font.init()
 		f = pygame.font.SysFont("", 30)
