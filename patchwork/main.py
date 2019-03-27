@@ -6,6 +6,7 @@ import pygame
 import argparse
 from controller.PatchworkControllerPvP import PatchworkControllerPvP
 from controller.PatchworkControllerPvAI import PatchworkControllerPvAI
+from controller.PatchworkControllerAIvAI import PatchworkControllerAIvAI
 
 def main():
 	parser = argparse.ArgumentParser(description='Select play mode and configure learning for patchwork')
@@ -18,7 +19,7 @@ def main():
 			if args.graphical:
 				print("AI v AI Graphical Placeholder")
 			else:
-				print("AI v AI terminal placeholder")
+				PatchworkControllerAIvAI().mainloop()
 		elif args.mode == "pp":
 			PatchworkControllerPvP().mainloop()
 		else:
