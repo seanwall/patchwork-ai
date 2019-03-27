@@ -49,11 +49,22 @@ class PatchworkView():
 			curr_player = model.p2
 			other_player = model.p1
 
-		#rendering for a 1x1 tile placement
+		#Text
+		pygame.font.init()
+		f = pygame.font.SysFont("", 30)
+		player_text = f.render("Player: " + str(curr_player.player_num), False, (255, 255, 255))
+		other_player_text = f.render("Player: " + str(other_player.player_num), False, (255, 255, 255))
+
+		#rendering for a 1x1 tile placement (other player is primary board in this case)
 		if phase == MovePhase.SPECIAL_PLACEPHASE:
+			self.screen.blit(other_player_text, (self.WIDTH/4.5, self.HEIGHT/8 - 20))
+			self.screen.blit(player_text, (self.WIDTH/30, self.HEIGHT/6 - 20))
 			other_player.render_board_primary(self.primary_board_surface, 0, 0)
 			curr_player.render_board_primary(self.secondary_board_surface, 0, 0)
+		#rendering for all other phases, where current player is primary board and other player is secondary
 		else:
+			self.screen.blit(player_text, (self.WIDTH/4.5, self.HEIGHT/8 - 20))
+			self.screen.blit(other_player_text, (self.WIDTH/30, self.HEIGHT/6 - 20))
 			curr_player.render_board_primary(self.primary_board_surface, 0, 0)
 			other_player.render_board_primary(self.secondary_board_surface, 0, 0)
 
@@ -71,5 +82,20 @@ class PatchworkView():
 		self.screen.blit(self.piece_surface, (piece_list_x, piece_scroll_y))
 		self.screen.blit(self.primary_board_surface, (self.WIDTH/4.5, self.HEIGHT/8))
 		self.screen.blit(self.secondary_board_surface, (self.WIDTH/30, self.HEIGHT/6))
+
+		#rules text based on phase
+		rules_text = f.render("Hover over the time track or patch list to scroll through them.", False, (0, 0, 0))
+		rules_text_2 = f.render("^ This might only work with a track pad idk", False, (0, 0, 0))
+		if phase == MovePhase.SPECIAL_PLACEPHASE or phase == MovePhase.PLACEPHASE:
+			specific_text = f.render("ARROW KEYS to move piece, SPACE to rotate piece, SHIFT to place piece ", False, (255, 255, 255))
+		else:
+			specific_text = f.render("ARROW KEYS to highlight piece, ENTER to select piece", False, (255, 255, 255))
+
+		self.screen.blit(rules_text, (50, 30))
+		self.screen.blit(rules_text_2, (50, 50))
+		self.screen.blit(specific_text, (50, 70))
+
+
+
 
 		pygame.display.flip()

@@ -4,9 +4,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 import pygame
 import argparse
-from controller.PatchworkControllerPvP import PatchworkControllerPvP
-from controller.PatchworkControllerPvAI import PatchworkControllerPvAI
-from controller.PatchworkControllerAIvAI import PatchworkControllerAIvAI
+from patchwork.controller.PatchworkControllerPvP import PatchworkControllerPvP
+from patchwork.controller.PatchworkControllerPvAI import PatchworkControllerPvAI
+from patchwork.controller.PatchworkControllerAIvAI import PatchworkControllerAIvAI
 
 def main():
 	parser = argparse.ArgumentParser(description='Select play mode and configure learning for patchwork')

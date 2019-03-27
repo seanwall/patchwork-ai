@@ -115,7 +115,7 @@ class Player():
 
 	#render board when it is the focused board (current player)
 	def render_board_primary(self, surface, x, y):
-		self.quilt.render_primary(surface, x, y, self.buttons)
+		self.quilt.render_primary(surface, x, y, self.buttons, self.player_num)
 
 	#render board when it is the unfocused board (not the current player)
 	def render_board_secondary(self, surface, x, y):

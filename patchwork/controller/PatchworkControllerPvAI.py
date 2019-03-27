@@ -34,7 +34,7 @@ class PatchworkControllerPvAI():
 		#self.model.p2.position = 17
 
 		self.clock = pygame.time.Clock()
-		pygame.display.set_caption("TEST TEST TEST")
+		pygame.display.set_caption("P v AI")
 
 		self.running = True
 
@@ -125,7 +125,6 @@ class PatchworkControllerPvAI():
 										#check for 1x1 placement
 										self.model.place_patch(player, self.model.patch_list[highlighted_patch_idx], selected_patch_row, selected_patch_col)
 										passed_patch = self.model.buy_patch(highlighted_patch_idx)
-										print(passed_patch)
 										if passed_patch:
 											phase = MovePhase.SPECIAL_PLACEPHASE
 											selected_patch = Patch([[1]], 0, 0, 0)

@@ -59,7 +59,7 @@ class QuiltBoard():
 		return sum
 
 	#TODO: THIS IS BAD, NEED BETTER VIEW HANDLING PASSING EVERYTHING AROUND IS MESSY
-	def render_primary(self, surface, x, y, button_count):
+	def render_primary(self, surface, x, y, button_count, player_num):
 		square_width = int(surface.get_width()/9)
 
 		pygame.font.init()
@@ -67,8 +67,8 @@ class QuiltBoard():
 		buttons_text = f.render("Buttons: " + str(button_count), False, (255, 255, 255))
 		button_gen_text = f.render("Button Gen: " + str(self.button_gen), False, (255, 255, 255))
 
-		surface.blit(buttons_text, (x, y + square_width * 9 + 20))
-		surface.blit(button_gen_text, (x, y + square_width * 9 + 40))
+		surface.blit(buttons_text, (x, y + square_width * 9 + 40))
+		surface.blit(button_gen_text, (x, y + square_width * 9 + 60))
 
 		for row in range(len(self.board_array)):
 			for col in range(len(self.board_array[row])):
