@@ -50,19 +50,19 @@ class PatchworkView():
 			other_player = model.p1
 
 		#rendering for a 1x1 tile placement
-		#if phase == MovePhase.SPECIAL_PLACEPHASE:
-		#	other_player.render_board_primary(self.primary_board_surface, 0, 0)
-		#	curr_player.render_board_primary(self.primary_board_surface, 0, 0)
-		#else:
-		#	curr_player.render_board_primary(self.primary_board_surface, 0, 0)
-		#	other_player.render_board_primary(self.secondary_board_surface, 0, 0)
+		if phase == MovePhase.SPECIAL_PLACEPHASE:
+			other_player.render_board_primary(self.primary_board_surface, 0, 0)
+			curr_player.render_board_primary(self.secondary_board_surface, 0, 0)
+		else:
+			curr_player.render_board_primary(self.primary_board_surface, 0, 0)
+			other_player.render_board_primary(self.secondary_board_surface, 0, 0)
 
-		curr_player.render_board_primary(self.primary_board_surface, 0, 0)
-		other_player.render_board_primary(self.secondary_board_surface, 0, 0)
+		#curr_player.render_board_primary(self.primary_board_surface, 0, 0)
+		#other_player.render_board_primary(self.secondary_board_surface, 0, 0)
 
 		#draw selected patch if in the placement phase
-		#if phase == MovePhase.PLACEPHASE or phase == MovePhase.SPECIAL_PLACEPHASE:
-		if phase == MovePhase.PLACEPHASE:
+		if phase == MovePhase.PLACEPHASE or phase == MovePhase.SPECIAL_PLACEPHASE:
+		#if phase == MovePhase.PLACEPHASE:
 			if selected_patch is not None:
 				selected_patch.render_placement(self.primary_board_surface, selected_patch_col, selected_patch_row, (0, 255, 0))
 

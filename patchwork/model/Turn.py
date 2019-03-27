@@ -3,8 +3,8 @@ class BuyTurn():
 		self.patch_idx = patch_idx
 
 	def run(self, model):
-		model.buy_patch(self.patch_idx)
+		return model.buy_patch(self.patch_idx)
 
 class JumpTurn():
 	def run(self, model):
-		model.jump()
+		return model.jump()

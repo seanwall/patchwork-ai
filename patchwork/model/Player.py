@@ -96,7 +96,7 @@ class Player():
 
 		self.buttons += distance
 
-		self.move(distance, time_track, other_player)
+		return self.move(distance, time_track, other_player)
 
 	def update_order(self, on_top):
 		self.on_top = on_top

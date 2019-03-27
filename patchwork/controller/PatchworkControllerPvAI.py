@@ -13,6 +13,7 @@ from controller.MovePhase import MovePhase
 from ai.PatchworkAI import PatchworkAI
 from model.Turn import BuyTurn
 from model.Turn import JumpTurn
+from model.Patch import Patch
 
 class PatchworkControllerPvAI():
 	FLAGS = 0
@@ -27,6 +28,10 @@ class PatchworkControllerPvAI():
 		self.view = PatchworkView()
 		self.model = PatchworkModel()
 		self.ai = PatchworkAI()
+
+		#TESTING
+		self.model.p1.position = 17
+		self.model.p2.position = 17
 
 		self.clock = pygame.time.Clock()
 		pygame.display.set_caption("TEST TEST TEST")
@@ -51,6 +56,12 @@ class PatchworkControllerPvAI():
 
 
 		while self.running:
+			if self.model.p1_turn():
+				player = self.model.p1
+				other_player = self.model.p2
+			else:
+				player = self.model.p2
+				other_player = self.model.p1
 			#Don't do any more processing if the game is over
 			#if self.model.game_over():
 			#	self.view.render(self.model, phase, track_scroll_y, piece_scroll_y, highlighted_patch_idx, selected_patch, selected_patch_row, selected_patch_col)
@@ -60,7 +71,7 @@ class PatchworkControllerPvAI():
 
 			#EVENT HANDLING
 			#p1 is the human player
-			if self.model.p1_turn():
+			if self.model.p1_turn() or phase == MovePhase.SPECIAL_PLACEPHASE:
 				for event in pygame.event.get():
 					if event.type == pygame.MOUSEBUTTONDOWN:
 						#if mouse is hovering the time track, scroll the time track
@@ -81,20 +92,18 @@ class PatchworkControllerPvAI():
 								if highlighted_patch_idx > 0:
 									highlighted_patch_idx -= 1
 							if event.key == pygame.K_RETURN:
-								#if self.model.buy_patch(curr_player, highlighted_patch_idx) is not None:
 								#if the patch is purchasable by the current player, enter placement mode
 								if self.model.can_buy(highlighted_patch_idx) :
 									selected_patch = self.model.patch_list[highlighted_patch_idx]
 									phase = MovePhase.PLACEPHASE
 							if event.key == pygame.K_TAB:
 								#check for 1x1 placement
-								self.model.jump()
-								#if self.model.jump():
-								#	phase = MovePhase.SPECIAL_PLACEPHASE
-								#	selected_patch = Patch([[1]], 0, 0, 0)
+								if self.model.jump():
+									phase = MovePhase.SPECIAL_PLACEPHASE
+									selected_patch = Patch([[1]], 0, 0, 0)
 
-						#if phase == MovePhase.PLACEPHASE or phase == MovePhase.SPECIAL_PLACEPHASE:
-						if phase == MovePhase.PLACEPHASE:
+						if phase == MovePhase.PLACEPHASE or phase == MovePhase.SPECIAL_PLACEPHASE:
+						#if phase == MovePhase.PLACEPHASE:
 							if event.key == pygame.K_UP:
 								if selected_patch_row > 0:
 									selected_patch_row -= 1
@@ -112,22 +121,20 @@ class PatchworkControllerPvAI():
 							if event.key == pygame.K_RSHIFT or event.key == pygame.K_LSHIFT:
 								if self.model.can_place(selected_patch, selected_patch_row, selected_patch_col):
 									#if in placephase, buy the patch to advance to next phase
-									#if phase == MovePhase.PLACEPHASE:
-									self.model.place_patch(selected_patch, selected_patch_row, selected_patch_col)
-									self.model.buy_patch(highlighted_patch_idx)
-									phase = MovePhase.BUYPHASE
+									if phase == MovePhase.PLACEPHASE:
 										#check for 1x1 placement
-										#passed_patch = self.model.buy_patch(highlighted_patch_idx)
-										#print(passed_patch)
-										#if passed_patch:
-										#	phase = MovePhase.SPECIAL_PLACEPHASE
-										#	selected_patch = Patch([[1]], 0, 0, 0)
-										#else:
-										#	phase = MovePhase.BUYPHASE
+										self.model.place_patch(player, self.model.patch_list[highlighted_patch_idx], selected_patch_row, selected_patch_col)
+										passed_patch = self.model.buy_patch(highlighted_patch_idx)
+										print(passed_patch)
+										if passed_patch:
+											phase = MovePhase.SPECIAL_PLACEPHASE
+											selected_patch = Patch([[1]], 0, 0, 0)
+										else:
+											phase = MovePhase.BUYPHASE
 									#else in special place phase, phase ends when piece is placed (dont need to buy)
-									#else:
-									#	self.model.place_patch(selected_patch, selected_patch_row, selected_patch_col)
-									#	phase = MovePhase.BUYPHASE
+									else:
+										self.model.place_patch(other_player, selected_patch, selected_patch_row, selected_patch_col)
+										phase = MovePhase.BUYPHASE
 
 					if event.type == pygame.QUIT:
 						self.running = False
@@ -146,8 +153,12 @@ class PatchworkControllerPvAI():
 						turn = JumpTurn()
 					else:
 						row, col = self.ai.choose_placement(self.model.patch_list[turn.patch_idx], self.model.p2.quilt)
-						self.model.place_patch(self.model.patch_list[turn.patch_idx], row, col)
-				turn.run(self.model)
+						self.model.place_patch(player, self.model.patch_list[turn.patch_idx], row, col)
+				#place 1x1 patch
+				if turn.run(self.model):
+					row, col = self.ai.choose_placement(Patch([[1]], 0, 0, 0), self.model.p2.quilt)
+					self.model.place_patch(player, Patch([[1]], 0, 0, 0), row, col)
+
 
 				#RENDERING
 

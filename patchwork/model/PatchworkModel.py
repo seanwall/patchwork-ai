@@ -64,14 +64,9 @@ class PatchworkModel():
 			del self.patch_list[patch_idx]
 			self.patch_list.rotate(-patch_idx)
 
-			player.buy_patch(patch, self.time_track, other_player)
+			return player.buy_patch(patch, self.time_track, other_player)
 
-	def place_patch(self, patch, row, col):
-		if self.p1_turn():
-			player = self.p1
-		else:
-			player = self.p2
-
+	def place_patch(self, player, patch, row, col):
 		player.place_patch(patch, row, col)
 
 	def can_buy(self, patch_idx):
