@@ -8,6 +8,7 @@ import pygame
 import enum
 
 from model.PatchworkModel import PatchworkModel
+from model.Patch import Patch
 from view.PatchworkView import PatchworkView
 from controller.MovePhase import MovePhase
 
@@ -23,6 +24,9 @@ class PatchworkControllerPvP():
 		
 		self.view = PatchworkView()
 		self.model = PatchworkModel()
+
+		self.model.p1.position = 19
+		self.model.p2.position = 19
 
 		self.clock = pygame.time.Clock()
 		pygame.display.set_caption("TEST TEST TEST")
@@ -51,6 +55,12 @@ class PatchworkControllerPvP():
 
 
 		while self.running:
+			if self.model.p1_turn():
+				player = self.model.p1
+				other_player = self.model.p2
+			else:
+				player = self.model.p2
+				other_player = self.model.p1
 			#Don't do any more processing if the game is over
 			#if self.model.game_over():
 			#	self.view.render(self.model, phase, track_scroll_y, piece_scroll_y, highlighted_patch_idx, selected_patch, selected_patch_row, selected_patch_col)
@@ -79,16 +89,18 @@ class PatchworkControllerPvP():
 							if highlighted_patch_idx > 0:
 								highlighted_patch_idx -= 1
 						if event.key == pygame.K_RETURN:
-							#if self.model.buy_patch(curr_player, highlighted_patch_idx) is not None:
 							#if the patch is purchasable by the current player, enter placement mode
 							if self.model.can_buy(highlighted_patch_idx) :
 								selected_patch = self.model.patch_list[highlighted_patch_idx]
 								phase = MovePhase.PLACEPHASE
 						if event.key == pygame.K_TAB:
-							self.model.jump()
-							p1_turn = self.model.p1_turn()
+							#check for 1x1 placement
+							if self.model.jump():
+								phase = MovePhase.SPECIAL_PLACEPHASE
+								selected_patch = Patch([[1]], 0, 0, 0)
 
-					if phase == MovePhase.PLACEPHASE:
+					if phase == MovePhase.PLACEPHASE or phase == MovePhase.SPECIAL_PLACEPHASE:
+					#if phase == MovePhase.PLACEPHASE:
 						if event.key == pygame.K_UP:
 							if selected_patch_row > 0:
 								selected_patch_row -= 1
@@ -105,18 +117,26 @@ class PatchworkControllerPvP():
 							selected_patch.rotate_cw()
 						if event.key == pygame.K_RSHIFT or event.key == pygame.K_LSHIFT:
 							if self.model.can_place(selected_patch, selected_patch_row, selected_patch_col):
-
-								self.model.place_patch(selected_patch, selected_patch_row, selected_patch_col)
-								self.model.buy_patch(highlighted_patch_idx)
-
-								phase = MovePhase.BUYPHASE
-								p1_turn = self.model.p1_turn()
+								#if in placephase, buy the patch to advance to next phase
+								if phase == MovePhase.PLACEPHASE:
+									#check for 1x1 placement
+									self.model.place_patch(player, self.model.patch_list[highlighted_patch_idx], selected_patch_row, selected_patch_col)
+									passed_patch = self.model.buy_patch(highlighted_patch_idx)
+									print(passed_patch)
+									if passed_patch:
+										phase = MovePhase.SPECIAL_PLACEPHASE
+										selected_patch = Patch([[1]], 0, 0, 0)
+									else:
+										phase = MovePhase.BUYPHASE
+								#else in special place phase, phase ends when piece is placed (dont need to buy)
+								else:
+									self.model.place_patch(other_player, selected_patch, selected_patch_row, selected_patch_col)
+									phase = MovePhase.BUYPHASE
 
 				if event.type == pygame.QUIT:
 					self.running = False
 
-				#RENDERING
-
+			#RENDERING
 			self.view.render(self.model, phase, track_scroll_y, piece_scroll_y, highlighted_patch_idx, selected_patch, selected_patch_row, selected_patch_col)
 			
 		pygame.quit()
