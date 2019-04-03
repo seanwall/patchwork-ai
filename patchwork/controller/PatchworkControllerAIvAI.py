@@ -22,14 +22,14 @@ class PatchworkControllerAIvAI():
 			turn = self.ai.choose_turn(self.model)
 			if isinstance(turn, BuyTurn):
 				#TEMPORARY HANDLING FOR IF THE PIECE CANT BE PLACED, NEED NEW SOLUTION FOR THIS
-				if self.ai.choose_placement(self.model.patch_list[turn.patch_idx], player.quilt) == False:
+				if not self.ai.can_place(self.model.patch_list[turn.patch_idx], player.quilt):
 					turn = JumpTurn()
 				else:
-					row, col = self.ai.choose_placement(self.model.patch_list[turn.patch_idx], player.quilt)
-					self.model.place_patch(player, self.model.patch_list[turn.patch_idx], row, col)
+					row, col, patch_orientation = self.ai.choose_placement(self.model.patch_list[turn.patch_idx], player.quilt)
+					self.model.place_patch(player, patch_orientation, row, col)
 			#run the turn (buy piece for buy, jump for jump), and check if patch is passed on time track
 			if turn.run(self.model):
-				row, col = self.ai.choose_placement(Patch([[1]], 0, 0, 0), other_player.quilt)
+				row, col, patch_orientation = self.ai.choose_placement(Patch([[1]], 0, 0, 0), other_player.quilt)
 				self.model.place_patch(other_player, Patch([[1]], 0, 0, 0), row, col)
 
 			if self.model.game_over():

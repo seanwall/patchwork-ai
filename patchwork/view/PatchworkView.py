@@ -87,9 +87,9 @@ class PatchworkView():
 		rules_text = f.render("Hover over the time track or patch list to scroll through them.", False, (0, 0, 0))
 		rules_text_2 = f.render("^ This might only work with a track pad idk", False, (0, 0, 0))
 		if phase == MovePhase.SPECIAL_PLACEPHASE or phase == MovePhase.PLACEPHASE:
-			specific_text = f.render("ARROW KEYS to move piece, SPACE to rotate piece, SHIFT to place piece ", False, (255, 255, 255))
+			specific_text = f.render("ARROW KEYS to move piece, SPACE to rotate piece, W or S to flip piece, SHIFT to place piece ", False, (255, 255, 255))
 		else:
-			specific_text = f.render("ARROW KEYS to highlight piece, ENTER to select piece", False, (255, 255, 255))
+			specific_text = f.render("ARROW KEYS to highlight piece, ENTER to select piece, or TAB to pass", False, (255, 255, 255))
 
 		self.screen.blit(rules_text, (50, 30))
 		self.screen.blit(rules_text_2, (50, 50))

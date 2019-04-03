@@ -2,9 +2,12 @@ import pygame
 
 class Patch():
 	#TODO, would be nice if patches had their buttons on them
-	def __init__(self, shape, cost, time_cost, button_gen): #these names suck
+	def __init__(self, shape, cost, time_cost, button_gen, orientation = None): #these names suck
 		self.shape = shape
-		self.orientation = shape
+		if orientation is None:
+			self.orientation = shape
+		else:
+			self.orientation = orientation
 		self.cost = cost
 		self.time_cost = time_cost
 		self.button_gen = button_gen
@@ -20,6 +23,24 @@ class Patch():
 				rotated_shape[col][transform_width - row - 1] = self.orientation[row][col]
 
 		self.orientation = rotated_shape
+
+	def flip(self):
+		flipped_shape = [[0 for width in range(len(self.orientation[0]))] for height in range(len(self.orientation))]
+
+		for row in range(len(self.orientation)):
+			for col in range(len(self.orientation[row])):
+				flipped_idx = len(self.orientation[row]) - 1 - col
+				flipped_shape[row][flipped_idx] = self.orientation[row][col]
+
+		self.orientation = flipped_shape
+
+	def copy(self):
+		orientation_copy = [list(row) for row in self.orientation]
+		shape_copy = [list(row) for row in self.shape]
+
+		copy = Patch(shape_copy, self.cost, self.time_cost, self.button_gen, orientation = orientation_copy)
+
+		return copy
 
 	#renders patch onto the given surface with the upper left hand corner starting at x,y
 	def render_buy_list(self, surface, x, y):

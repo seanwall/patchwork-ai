@@ -81,6 +81,29 @@ class TestQuiltBoardMethods(unittest.TestCase):
 
 		self.assertEqual(new_board.calculate_board_coverage(), 0)
 
+	def test_copy_quilt(self):
+		test_board_array = [[0 for row in range(9)] for col in range(9)]
+		new_board = QuiltBoard()
+
+		for i in range (5):
+			test_board_array[i][i] = 1
+			new_board.board_array[i][i] = 1
+
+		self.assertEqual(test_board_array, new_board.board_array)
+
+		copy = new_board.copy()
+
+		self.assertEqual(test_board_array, new_board.board_array)
+		self.assertEqual(test_board_array, copy.board_array)
+
+		test_board_array2 = [[0 for row in range(9)] for col in range(9)]
+		for i in range(9):
+			new_board.board_array[i][i] = 1
+			test_board_array2[i][i] = 1
+
+		self.assertEqual(test_board_array2, new_board.board_array)
+		self.assertEqual(test_board_array, copy.board_array)
+
 class TestPatchMethods(unittest.TestCase):
 
 	def test_patch_rotate(self):
@@ -103,6 +126,106 @@ class TestPatchMethods(unittest.TestCase):
 
 		self.assertEqual(tetris.shape, tetris_array)
 		self.assertEqual(tetris.orientation, tetris_array_rotated)
+
+	def test_patch_flip(self):
+		tetris_array_top = [1, 0] 
+		tetris_array_mid = [1, 1]
+		tetris_array_bot = [1, 0]
+
+		tetris_array = [tetris_array_top, tetris_array_mid, tetris_array_bot]
+		tetris = Patch(tetris_array, 2, 3, 0)
+
+		tetris_array_flip_top = [0, 1] 
+		tetris_array_flip_mid = [1, 1]
+		tetris_array_flip_bot = [0, 1]
+
+		tetris_array_flipped = [tetris_array_flip_top, tetris_array_flip_mid, tetris_array_flip_bot]
+
+		self.assertEqual(tetris.shape, tetris_array)
+		self.assertEqual(tetris.orientation, tetris_array)
+
+		tetris.flip()
+
+		self.assertEqual(tetris.shape, tetris_array)
+		self.assertEqual(tetris.orientation, tetris_array_flipped)
+
+		l_array_top = [1, 0] 
+		l_array_mid = [1, 0]
+		l_array_bot = [1, 1]
+
+		l_array = [l_array_top, l_array_mid, l_array_bot]
+		l_patch = Patch(l_array, 2, 3, 0)
+
+		l_array_flip_top = [0, 1] 
+		l_array_flip_mid = [0, 1]
+		l_array_flip_bot = [1, 1]
+
+		l_array_flipped = [l_array_flip_top, l_array_flip_mid, l_array_flip_bot]
+
+		self.assertEqual(l_patch.shape, l_array)
+		self.assertEqual(l_patch.orientation, l_array)
+
+		l_patch.flip()
+
+		self.assertEqual(l_patch.shape, l_array)
+		self.assertEqual(l_patch.orientation, l_array_flipped)
+
+	def test_copy_patch(self):
+		tetris_array_top = [1, 0] 
+		tetris_array_mid = [1, 1]
+		tetris_array_bot = [1, 0]
+
+		tetris_array = [tetris_array_top, tetris_array_mid, tetris_array_bot]
+		tetris = Patch(tetris_array, 2, 3, 0)
+
+		self.assertEqual(tetris.shape, tetris_array)
+		self.assertEqual(tetris.orientation, tetris_array)
+		self.assertEqual(tetris.cost, 2)
+		self.assertEqual(tetris.time_cost, 3)
+		self.assertEqual(tetris.button_gen, 0)
+
+		copy = tetris.copy()
+
+		self.assertEqual(copy.shape, tetris_array)
+		self.assertEqual(copy.orientation, tetris_array)
+		self.assertEqual(copy.cost, 2)
+		self.assertEqual(copy.time_cost, 3)
+		self.assertEqual(copy.button_gen, 0)
+
+		tetris.rotate_cw()
+
+		tetris_array_cw_top = [1, 1, 1]
+		tetris_array_cw_mid = [0, 1, 0]
+
+		tetris_array_rotated = [tetris_array_cw_top, tetris_array_cw_mid]
+
+		self.assertEqual(tetris.shape, tetris_array)
+		self.assertEqual(tetris.orientation, tetris_array_rotated)
+		self.assertEqual(tetris.cost, 2)
+		self.assertEqual(tetris.time_cost, 3)
+		self.assertEqual(tetris.button_gen, 0)
+
+		self.assertEqual(copy.shape, tetris_array)
+		self.assertEqual(copy.orientation, tetris_array)
+		self.assertEqual(copy.cost, 2)
+		self.assertEqual(copy.time_cost, 3)
+		self.assertEqual(copy.button_gen, 0)
+
+		copy.rotate_cw()
+
+		self.assertEqual(tetris.shape, tetris_array)
+		self.assertEqual(tetris.orientation, tetris_array_rotated)
+		self.assertEqual(tetris.cost, 2)
+		self.assertEqual(tetris.time_cost, 3)
+		self.assertEqual(tetris.button_gen, 0)
+
+		self.assertEqual(copy.shape, tetris_array)
+		self.assertEqual(copy.orientation, tetris_array_rotated)
+		self.assertEqual(copy.cost, 2)
+		self.assertEqual(copy.time_cost, 3)
+		self.assertEqual(copy.button_gen, 0)
+
+
 
 
 class TestPlayerMethods(unittest.TestCase):

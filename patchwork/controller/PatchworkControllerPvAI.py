@@ -118,6 +118,8 @@ class PatchworkControllerPvAI():
 									selected_patch_col += 1
 							if event.key == pygame.K_SPACE:
 								selected_patch.rotate_cw()
+							if event.key == pygame.K_w or event.key == pygame.K_s:
+								selected_patch.flip()
 							if event.key == pygame.K_RSHIFT or event.key == pygame.K_LSHIFT:
 								if self.model.can_place(selected_patch, selected_patch_row, selected_patch_col):
 									#if in placephase, buy the patch to advance to next phase
@@ -148,14 +150,14 @@ class PatchworkControllerPvAI():
 				if isinstance(turn, BuyTurn):
 
 					#TEMPORARY HANDLING FOR IF THE PIECE CANT BE PLACED, NEED NEW SOLUTION FOR THIS
-					if self.ai.choose_placement(self.model.patch_list[turn.patch_idx], self.model.p2.quilt) == False:
+					if not self.ai.can_place(self.model.patch_list[turn.patch_idx], self.model.p2.quilt):
 						turn = JumpTurn()
 					else:
-						row, col = self.ai.choose_placement(self.model.patch_list[turn.patch_idx], self.model.p2.quilt)
-						self.model.place_patch(player, self.model.patch_list[turn.patch_idx], row, col)
+						row, col, patch_orientation = self.ai.choose_placement(self.model.patch_list[turn.patch_idx], self.model.p2.quilt)
+						self.model.place_patch(player, patch_orientation, row, col)
 				#place 1x1 patch
 				if turn.run(self.model):
-					row, col = self.ai.choose_placement(Patch([[1]], 0, 0, 0), self.model.p2.quilt)
+					row, col, patch_orientation = self.ai.choose_placement(Patch([[1]], 0, 0, 0), self.model.p2.quilt)
 					self.model.place_patch(player, Patch([[1]], 0, 0, 0), row, col)
 
 

@@ -1,10 +1,13 @@
-from model.Patch import Patch
+from patchwork.model.Patch import Patch
 import pygame
 
 class QuiltBoard():
 	
-	def __init__(self):
-		self.board_array = [[0 for row in range(9)] for col in range(9)]
+	def __init__(self, board_array = None):
+		if board_array is None:
+			self.board_array = [[0 for row in range(9)] for col in range(9)]
+		else:
+			self.board_array = board_array
 		self.pieces = []
 		self.button_gen = 0
 
@@ -47,6 +50,11 @@ class QuiltBoard():
 			#update button gen for the board and the pieces list
 			self.button_gen += patch.button_gen
 			self.pieces.append(patch)
+
+	def copy(self):
+		board_copy = [list(row) for row in self.board_array]
+		copy = QuiltBoard(board_array = board_copy)
+		return copy
 
 	#-2 for each open tile
 	def calculate_board_coverage(self):
