@@ -11,4 +11,6 @@ If no arguments are specified Patchwork.py will default to a Player vs AI run.
 
 -m {pp, pa, aa} or --mode {pp, pa, aa} : "pp" designates a Player vs Player run, "pa" designates Player vs AI, "aa" designates AI vs AI
 
+-s {int} or --sample {int} : given in addition to "-m aa", will run the designated number of sample games AI v AI. Used to calculate win % for different AI implementations
+
 An additional flag will be added in the future to designate if the run should be used as training data for AI learning
