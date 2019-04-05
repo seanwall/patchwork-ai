@@ -141,7 +141,7 @@ class PatchworkControllerPvAI():
 					if event.type == pygame.QUIT:
 						self.running = False
 
-				turn = self.ai.choose_turn(self.model)
+				turn = self.ai.choose_turn_hand_craft(self.model)
 				if isinstance(turn, BuyTurn):
 
 					#TEMPORARY HANDLING FOR IF THE PIECE CANT BE PLACED, NEED NEW SOLUTION FOR THIS

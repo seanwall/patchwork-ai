@@ -7,11 +7,11 @@ from patchwork.model.Patch import Patch
 from patchwork.model.Player import Player
 
 class PatchworkAI():
-	def choose_turn(self, model):
+	def choose_turn_first_available(self, model):
 		return model.get_turns()[0]
 
 	#basic AI that picks the patch with the greatest econ gen value
-	def choose_turn_basic(self, model):
+	def choose_turn_hand_craft(self, model):
 		turns = model.get_turns()
 		best_turn = turns[0]
 

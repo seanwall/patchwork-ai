@@ -30,9 +30,9 @@ class PatchworkControllerAIvAI():
 
 				#p1 is smart, p2 is dumb
 				if self.model.p1_turn():
-					turn = self.ai.choose_turn_basic(self.model)
+					turn = self.ai.choose_turn_hand_craft(self.model)
 				else:
-					turn = self.ai.choose_turn(self.model)
+					turn = self.ai.choose_turn_first_available(self.model)
 
 
 
