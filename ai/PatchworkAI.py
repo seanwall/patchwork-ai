@@ -24,7 +24,7 @@ class PatchworkAI():
 			player = model.p2
 
 		#if player is early in the game go for button generation
-		if player.position > 40:
+		if player.position < 30:
 			#know if we get here the current best_turn is a buy turn
 			for turn in turns:
 				#if it's a buy turn, check the patch econ gen value
