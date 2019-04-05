@@ -1,9 +1,52 @@
 import math
 
+from patchwork.model.PatchworkModel import PatchworkModel
+from patchwork.model.Turn import JumpTurn
+from patchwork.model.Turn import BuyTurn
+from patchwork.model.Patch import Patch
+from patchwork.model.Player import Player
+
 class PatchworkAI():
 	def choose_turn(self, model):
 		return model.get_turns()[0]
 
+	#basic AI that picks the patch with the greatest econ gen value
+	def choose_turn_basic(self, model):
+		turns = model.get_turns()
+		best_turn = turns[0]
+
+		if isinstance(best_turn, JumpTurn):
+			return best_turn
+
+		if model.p1_turn():
+			player = model.p1
+		else:
+			player = model.p2
+
+		#if player is early in the game go for button generation
+		if player.position > 40:
+			#know if we get here the current best_turn is a buy turn
+			for turn in turns:
+				#if it's a buy turn, check the patch econ gen value
+				if isinstance(turn, BuyTurn):
+					patch = model.patch_list[turn.patch_idx]
+
+					if patch.button_gen > model.patch_list[best_turn.patch_idx].button_gen:
+						best_turn = turn
+		#else go for patches that take up the most space
+		else:
+			#know if we get here the current best_turn is a buy turn
+			for turn in turns:
+				#if it's a buy turn, check the patch space coverage
+				if isinstance(turn, BuyTurn):
+					patch = model.patch_list[turn.patch_idx]
+
+					if patch.get_area_coverage() > model.patch_list[best_turn.patch_idx].get_area_coverage():
+						best_turn = turn
+
+		#if isinstance(best_turn, BuyTurn):
+		#	print(model.patch_list[best_turn.patch_idx].button_gen)
+		return best_turn
 
 	#Check if piece can be placed anywhere on the board
 	def can_place(self, patch, quilt):

@@ -1,17 +1,13 @@
-import os
-import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 from collections import deque
 import random
 
-from model.Patch import Patch
-from model.Player import Player
-from model.QuiltBoard import QuiltBoard
-from model.TimeTrack import TimeTrack
-from model.TrackTile import TrackTile
-from model.Turn import BuyTurn
-from model.Turn import JumpTurn
+from patchwork.model.Patch import Patch
+from patchwork.model.Player import Player
+from patchwork.model.QuiltBoard import QuiltBoard
+from patchwork.model.TimeTrack import TimeTrack
+from patchwork.model.TrackTile import TrackTile
+from patchwork.model.Turn import BuyTurn
+from patchwork.model.Turn import JumpTurn
 
 class PatchworkModel():
 	PATCH_LIST_CONST = []

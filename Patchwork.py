@@ -1,7 +1,3 @@
-import os
-import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import pygame
 import argparse
 from patchwork.controller.PatchworkControllerPvP import PatchworkControllerPvP
@@ -12,6 +8,7 @@ def main():
 	parser = argparse.ArgumentParser(description='Select play mode and configure learning for patchwork')
 	parser.add_argument("-m", "--mode", choices=["pp", "pa", "aa"], help="Select the run mode for Patchwork (PvP: pp, PvAI: pa, AIvAI: aa). If not specified game will be PvAI")
 	parser.add_argument("-g", "--graphical", action='store_true', help="Designate if the game should run in gui - only matters for AIvAI, any player mode will always run graphically")
+	parser.add_argument("-s", "--sample", type=int,  help="Runs ai v ai the given number of times, and calculates the win \% for p1 and p2")
 
 	args = parser.parse_args()
 	if args.mode:
@@ -19,7 +16,10 @@ def main():
 			if args.graphical:
 				print("AI v AI Graphical Placeholder")
 			else:
-				PatchworkControllerAIvAI().mainloop()
+				if args.sample:
+					PatchworkControllerAIvAI().mainloop(args.sample)
+				else:
+					PatchworkControllerAIvAI().mainloop(1)
 		elif args.mode == "pp":
 			PatchworkControllerPvP().mainloop()
 		else:

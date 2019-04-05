@@ -62,7 +62,7 @@ class QuiltBoard():
 		for row in range(len(self.board_array)):
 			for col in range(len(self.board_array[row])):
 				if self.board_array[row][col] == 0:
-					sum -= 2
+					sum = sum - 2
 
 		return sum
 

@@ -1,5 +1,5 @@
-from model.QuiltBoard import QuiltBoard
-from model.TrackTile import TrackTile
+from patchwork.model.QuiltBoard import QuiltBoard
+from patchwork.model.TrackTile import TrackTile
 
 import pygame
 

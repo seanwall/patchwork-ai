@@ -1,7 +1,7 @@
 import pygame
 
-from model.PatchworkModel import PatchworkModel
-from controller.MovePhase import MovePhase
+from patchwork.model.PatchworkModel import PatchworkModel
+from patchwork.controller.MovePhase import MovePhase
 
 class PatchworkView():
 	WIDTH = 1500

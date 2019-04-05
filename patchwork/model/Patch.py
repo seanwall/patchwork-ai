@@ -42,6 +42,14 @@ class Patch():
 
 		return copy
 
+	def get_area_coverage(self):
+		coverage = 0
+		for row in range(len(self.shape)):
+			for col in range(len(self.shape[row])):
+				coverage += self.shape[row][col]
+		return coverage
+
+
 	#renders patch onto the given surface with the upper left hand corner starting at x,y
 	def render_buy_list(self, surface, x, y):
 		

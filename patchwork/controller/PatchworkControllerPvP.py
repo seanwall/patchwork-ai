@@ -1,16 +1,11 @@
-import os
-import sys
-import string
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import time 
 import pygame
 import enum
 
-from model.PatchworkModel import PatchworkModel
-from model.Patch import Patch
-from view.PatchworkView import PatchworkView
-from controller.MovePhase import MovePhase
+from patchwork.model.PatchworkModel import PatchworkModel
+from patchwork.model.Patch import Patch
+from patchwork.view.PatchworkView import PatchworkView
+from patchwork.controller.MovePhase import MovePhase
 
 class PatchworkControllerPvP():
 	FLAGS = 0
