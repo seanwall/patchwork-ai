@@ -2,7 +2,8 @@ import pygame
 
 class Patch():
 	#TODO, would be nice if patches had their buttons on them
-	def __init__(self, shape, cost, time_cost, button_gen, orientation = None): #these names suck
+	def __init__(self, id, shape, cost, time_cost, button_gen, orientation = None): #these names suck
+		self.id = id
 		self.shape = shape
 		if orientation is None:
 			self.orientation = shape
@@ -38,7 +39,7 @@ class Patch():
 		orientation_copy = [list(row) for row in self.orientation]
 		shape_copy = [list(row) for row in self.shape]
 
-		copy = Patch(shape_copy, self.cost, self.time_cost, self.button_gen, orientation = orientation_copy)
+		copy = Patch(self.id, shape_copy, self.cost, self.time_cost, self.button_gen, orientation = orientation_copy)
 
 		return copy
 

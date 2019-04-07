@@ -1,14 +1,14 @@
 import unittest
 from collections import deque
 
-from model.TimeTrack import TimeTrack
-from model.TrackTile import TrackTile
-from model.QuiltBoard import QuiltBoard
-from model.Patch import Patch
-from model.Player import Player
-from model.PatchworkModel import PatchworkModel
-from model.Turn import BuyTurn
-from model.Turn import JumpTurn
+from patchwork.model.TimeTrack import TimeTrack
+from patchwork.model.TrackTile import TrackTile
+from patchwork.model.QuiltBoard import QuiltBoard
+from patchwork.model.Patch import Patch
+from patchwork.model.Player import Player
+from patchwork.model.PatchworkModel import PatchworkModel
+from patchwork.model.Turn import BuyTurn
+from patchwork.model.Turn import JumpTurn
 
 class TestTimeTrackMethods(unittest.TestCase):
 
@@ -30,7 +30,7 @@ class TestQuiltBoardMethods(unittest.TestCase):
 		tetris_array_bot = [1, 0 ,0]
 
 		tetris_array = [tetris_array_top, tetris_array_mid, tetris_array_bot]
-		tetris = Patch(tetris_array, 2, 3, 0)
+		tetris = Patch(1, tetris_array, 2, 3, 0)
 
 		new_board = QuiltBoard()
 
@@ -53,7 +53,7 @@ class TestQuiltBoardMethods(unittest.TestCase):
 		test_board_array = [[0 for row in range(9)] for col in range(9)]
 
 		tetris_array = [tetris_array_top, tetris_array_mid, tetris_array_bot]
-		tetris = Patch(tetris_array, 2, 3, 0)
+		tetris = Patch(1, tetris_array, 2, 3, 0)
 
 		new_board = QuiltBoard()
 
@@ -108,7 +108,7 @@ class TestPatchMethods(unittest.TestCase):
 		tetris_array_bot = [1, 0]
 
 		tetris_array = [tetris_array_top, tetris_array_mid, tetris_array_bot]
-		tetris = Patch(tetris_array, 2, 3, 0)
+		tetris = Patch(1, tetris_array, 2, 3, 0)
 
 		tetris_array_cw_top = [1, 1, 1]
 		tetris_array_cw_mid = [0, 1, 0]
@@ -129,7 +129,7 @@ class TestPatchMethods(unittest.TestCase):
 		tetris_array_bot = [1, 0]
 
 		tetris_array = [tetris_array_top, tetris_array_mid, tetris_array_bot]
-		tetris = Patch(tetris_array, 2, 3, 0)
+		tetris = Patch(2, tetris_array, 2, 3, 0)
 
 		tetris_array_flip_top = [0, 1] 
 		tetris_array_flip_mid = [1, 1]
@@ -150,7 +150,7 @@ class TestPatchMethods(unittest.TestCase):
 		l_array_bot = [1, 1]
 
 		l_array = [l_array_top, l_array_mid, l_array_bot]
-		l_patch = Patch(l_array, 2, 3, 0)
+		l_patch = Patch(1, l_array, 2, 3, 0)
 
 		l_array_flip_top = [0, 1] 
 		l_array_flip_mid = [0, 1]
@@ -172,7 +172,7 @@ class TestPatchMethods(unittest.TestCase):
 		tetris_array_bot = [1, 0]
 
 		tetris_array = [tetris_array_top, tetris_array_mid, tetris_array_bot]
-		tetris = Patch(tetris_array, 2, 3, 0)
+		tetris = Patch(1, tetris_array, 2, 3, 0)
 
 		self.assertEqual(tetris.shape, tetris_array)
 		self.assertEqual(tetris.orientation, tetris_array)
@@ -234,7 +234,7 @@ class TestPlayerMethods(unittest.TestCase):
 		tetris_array_mid = [1, 1, 0]
 		tetris_array_bot = [1, 0 ,0]
 		tetris_array = [tetris_array_top, tetris_array_mid, tetris_array_bot]
-		tetris = Patch(tetris_array, 2, 3, 3)
+		tetris = Patch(1, tetris_array, 2, 3, 3)
 
 		p1.quilt.place_patch(tetris, 0, 0)
 
@@ -344,7 +344,7 @@ class TestPlayerMethods(unittest.TestCase):
 		tetris_array_mid = [1, 1, 0]
 		tetris_array_bot = [1, 0 ,0]
 		tetris_array = [tetris_array_top, tetris_array_mid, tetris_array_bot]
-		tetris = Patch(tetris_array, 2, 3, 3)
+		tetris = Patch(1, tetris_array, 2, 3, 3)
 
 		p1.buy_patch(tetris, track, p2)
 
@@ -362,7 +362,7 @@ class TestPlayerMethods(unittest.TestCase):
 		tetris_array_mid = [1, 1, 0]
 		tetris_array_bot = [1, 0 ,0]
 		tetris_array = [tetris_array_top, tetris_array_mid, tetris_array_bot]
-		tetris = Patch(tetris_array, 2, 3, 3)
+		tetris = Patch(1, tetris_array, 2, 3, 3)
 		p1.quilt.place_patch(tetris, 0, 0)
 
 		p2.position = 3

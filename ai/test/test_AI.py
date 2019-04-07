@@ -27,7 +27,7 @@ class PlacementMethods(unittest.TestCase):
 		board.board_array[1][0] = 1
 		board.board_array[1][1] = 1
 
-		row, col, patch_orientation = PatchworkAI().choose_placement(Patch([[1]], 0, 0, 0), board)
+		row, col, patch_orientation = PatchworkAI().choose_placement(Patch(1, [[1]], 0, 0, 0), board)
 
 		self.assertEqual(row, 0)
 		self.assertEqual(col, 0)
