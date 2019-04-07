@@ -17,7 +17,7 @@ def main():
 				print("AI v AI Graphical Placeholder")
 			else:
 				if args.sample:
-					PatchworkControllerAIvAI().mainloop(args.sample)
+					PatchworkControllerAIvAI().mainloop_learning(args.sample)
 				else:
 					PatchworkControllerAIvAI().mainloop(1)
 		elif args.mode == "pp":

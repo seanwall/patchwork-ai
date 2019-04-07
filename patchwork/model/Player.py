@@ -36,6 +36,7 @@ class Player():
 			other_player.update_order(True)
 
 		passed_patch = False
+		passed_button_gen = False
 
 		#check if the player passes an income or 1x1 patch tile
 		for tile in range(distance):
@@ -44,6 +45,7 @@ class Player():
 			#update current player button count if it ever passes an income tile
 			if time_track.track[tile + self.position] == TrackTile.INCOME or time_track.track[tile + self.position] == TrackTile.END:
 				self.buttons += self.quilt.button_gen
+				passed_button_gen = True
 
 			#update passed_patch value and remove the tile from the time_track 
 			if time_track.track[tile + self.position] == TrackTile.PATCH:
@@ -60,14 +62,14 @@ class Player():
 			other_player.update_order(False)
 			self.on_top = True
 
-		return passed_patch
+		return passed_patch, passed_button_gen
 
 	#TODO: algorithm to check if the patch will fit on the board anywhere
 	def can_buy(self, patch):
 		return patch.cost <= self.buttons
 
 
-	#returns value of move to see if a 1x1 patch was passed
+	#returns 2 boolean values, indicating whether the move returns a 1x1 patch, and if the move passed button_gen
 	def buy_patch(self, patch, time_track, other_player):
 		if patch.cost > self.buttons:
 			#raise Exception("Not enough buttons")
@@ -86,7 +88,7 @@ class Player():
 		return self.quilt.valid_placement(patch, row, col)
 
 	#jump to other player (move one past that player and gain the distance moved as income)
-	#returns value of move to be used to check if patch placement is needed
+	#returns 2 boolean values, indicating whether the move returns a 1x1 patch, and if the move passed button_gen
 	def jump(self, time_track, other_player):
 		distance = other_player.position - self.position + 1
 

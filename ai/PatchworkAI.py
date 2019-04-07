@@ -9,6 +9,62 @@ from patchwork.model.Player import Player
 import random
 
 class PatchworkAI():
+	LEARNING_RATE = .01
+	DISCOUNT_FACTOR = .1
+
+	def __init__(self):
+		self.feature_weights = []
+		self.initialize_weights()
+
+	#initialize feature weights to 0
+	def initialize_weights(self):
+		for i in range(34):
+			self.feature_weights.append(float(0))
+
+	#initial state utility, weight for each patch multiplied by state (state being if the player purchased that patch or not)
+	#right now this will just learn a general value for each patch
+	#TODO, different feature state list than just a list of patch ids
+	def get_state_utility(self, patch_state_list):
+		util = 0
+		for idx in range(len(patch_state_list)):
+			#add the weight of the current patch to the state utility
+			util += self.feature_weights[idx] * patch_state_list[idx]
+
+		return util
+
+
+	#TODO: scale value for winning based on how much the final score was
+	def calculate_reward(self, passed_1x1, button_gen, won):
+		reward = 0
+		if passed_1x1:
+			reward += 5
+		
+		reward += button_gen
+
+		if won == 1:
+			reward += 100
+		elif won == -1:
+			reward -= 100
+
+		return reward
+
+	def update_feature_weights(self, state_reward, future_state_util, curr_state_util, patch_state_list):
+
+		#update feature weights:
+		#wi = wi + a(r + y(U(S')-U(S))xi
+		#where:
+		#wi is in self.feature_weights[i]
+		#a is constant LEARNING_RATE
+		#r is given as state_reward - the reward of the current state (see __ for these rewards)
+		#y is constant DISCOUNT_FACTOR
+		#U(S') is given as future_state_util (see get_state_utility())
+		#U(S) is given as curr_state_util
+		#xi is in patch_state_list[i]
+		for i in range(len(self.feature_weights)):
+			prev_weight = self.feature_weights[i]
+			updated_weight = prev_weight + ((self.LEARNING_RATE)*(state_reward + (((self.DISCOUNT_FACTOR)*future_state_util) - curr_state_util)))*patch_state_list[i]
+			self.feature_weights[i] = updated_weight
+
 	def choose_turn_random(self, model):
 		turns = model.get_turns()
 		#if there is an available move that isnt a jump turn, have a reduced chance of selecting jump
@@ -59,6 +115,56 @@ class PatchworkAI():
 
 		#if isinstance(best_turn, BuyTurn):
 		#	print(model.patch_list[best_turn.patch_idx].button_gen)
+		return best_turn
+
+	def choose_turn_learning(self, model, passed_patch, passed_econ):
+		if model.p1_turn():
+			player = model.p1
+		else:
+			player = model.p2
+
+		turns = model.get_turns()
+		best_turn = turns[0]
+
+		if not isinstance(best_turn, JumpTurn):
+
+			best_patch_id = best_turn.patch_id
+			next_best_patch_state_list = list(player.quilt.patch_counts)
+			next_best_patch_state_list[best_patch_id] = next_best_patch_state_list[best_patch_id] + 1
+			#best next state util to compare against, if move is found with a higher next state util, choose that move
+			best_next_state_util = self.get_state_utility(next_best_patch_state_list)
+
+			#check utility for each next state for each of the turns
+			for turn in turns:
+				if isinstance(turn, BuyTurn):
+					patch_id = turn.patch_id
+
+					next_patch_state_list = list(player.quilt.patch_counts)
+
+					next_patch_state_list[patch_id] = next_patch_state_list[patch_id] + 1
+
+					next_state_util = self.get_state_utility(next_patch_state_list)
+
+					if next_state_util > best_next_state_util:
+						best_next_state_util = next_state_util
+						best_turn = turn
+
+			#once turn has been found, update weights
+			button_gen = 0
+			if passed_econ:
+				button_gen = player.quilt.button_gen
+			reward = self.calculate_reward(passed_patch, button_gen, False)
+		else:
+			next_best_patch_state_list = list(player.quilt.patch_counts)
+			best_next_state_util = self.get_state_utility(next_best_patch_state_list)
+			button_gen = 0
+			if passed_econ:
+				button_gen = player.quilt.button_gen
+			reward = self.calculate_reward(passed_patch, button_gen, False)
+
+
+		self.update_feature_weights(reward, best_next_state_util, self.get_state_utility(player.quilt.patch_counts), player.quilt.patch_counts)
+
 		return best_turn
 
 	#Check if piece can be placed anywhere on the board

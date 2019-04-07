@@ -44,7 +44,7 @@ class PatchworkModel():
 		else:
 			return 0
 
-	#return player.buy_patch to see if a patch was passed in the move
+	#return 2 boolean values, indicating whether the move returns a 1x1 patch, and if the move passed button_gen
 	def buy_patch(self, patch_idx):
 		if self.p1_turn():
 			player = self.p1
@@ -81,7 +81,7 @@ class PatchworkModel():
 
 		return player.can_place(patch, row, col)
 
-	#return player.jump value to see if a patch was passed
+	#return 2 boolean values, indicating whether the move returns a 1x1 patch, and if the move passed button_gen
 	def jump(self):
 		if self.p1_turn():
 			player = self.p1
@@ -109,7 +109,7 @@ class PatchworkModel():
 
 		for i in range(3):
 			if self.can_buy(i):
-				turns.append(BuyTurn(i))
+				turns.append(BuyTurn(i, self.patch_list[i].id))
 
 		turns.append(JumpTurn())
 
