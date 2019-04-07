@@ -32,7 +32,7 @@ class PatchworkControllerAIvAI():
 				if self.model.p1_turn():
 					turn = self.ai.choose_turn_hand_craft(self.model)
 				else:
-					turn = self.ai.choose_turn_first_available(self.model)
+					turn = self.ai.choose_turn_random(self.model)
 
 
 
@@ -45,8 +45,8 @@ class PatchworkControllerAIvAI():
 						self.model.place_patch(player, patch_orientation, row, col)
 				#run the turn (buy piece for buy, jump for jump), and check if patch is passed on time track
 				if turn.run(self.model):
-					row, col, patch_orientation = self.ai.choose_placement(Patch([[1]], 0, 0, 0), other_player.quilt)
-					self.model.place_patch(other_player, Patch([[1]], 0, 0, 0), row, col)
+					row, col, patch_orientation = self.ai.choose_placement(Patch(100, [[1]], 0, 0, 0), other_player.quilt)
+					self.model.place_patch(other_player, Patch(100, [[1]], 0, 0, 0), row, col)
 
 				#if game is over, exit running loop and update p1_win counter
 				if self.model.game_over():

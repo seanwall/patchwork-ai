@@ -6,9 +6,22 @@ from patchwork.model.Turn import BuyTurn
 from patchwork.model.Patch import Patch
 from patchwork.model.Player import Player
 
+import random
+
 class PatchworkAI():
-	def choose_turn_first_available(self, model):
-		return model.get_turns()[0]
+	def choose_turn_random(self, model):
+		turns = model.get_turns()
+		#if there is an available move that isnt a jump turn, have a reduced chance of selecting jump
+		if not isinstance(turns[0], JumpTurn):
+			#10% chance to select jump move
+			if random.random() <= .1:
+				turn = turns[len(turns) - 1]
+			#90% chance to randomly select an available buy move
+			else:
+				turn = turns[random.randint(0, (len(turns) - 2))]
+		else:
+			turn = turns[0]
+		return turn
 
 	#basic AI that picks the patch with the greatest econ gen value
 	def choose_turn_hand_craft(self, model):
