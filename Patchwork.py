@@ -17,6 +17,7 @@ def main():
 				print("AI v AI Graphical Placeholder")
 			else:
 				if args.sample:
+					#takes ~ 1min 30s to sample 100 games
 					PatchworkControllerAIvAI().mainloop_learning(args.sample)
 				else:
 					PatchworkControllerAIvAI().mainloop(1)

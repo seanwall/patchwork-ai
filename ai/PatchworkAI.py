@@ -13,13 +13,16 @@ class PatchworkAI():
 	DISCOUNT_FACTOR = .1
 
 	def __init__(self):
-		self.feature_weights = []
+		self.feature_weights = {}
 		self.initialize_weights()
 
 	#initialize feature weights to 0
 	def initialize_weights(self):
+		patch_weights = []
 		for i in range(34):
-			self.feature_weights.append(float(0))
+			patch_weights.append(float(0))
+
+		self.feature_weights["patch_weights"] = patch_weights
 
 	#initial state utility, weight for each patch multiplied by state (state being if the player purchased that patch or not)
 	#right now this will just learn a general value for each patch
@@ -28,7 +31,7 @@ class PatchworkAI():
 		util = 0
 		for idx in range(len(patch_state_list)):
 			#add the weight of the current patch to the state utility
-			util += self.feature_weights[idx] * patch_state_list[idx]
+			util += self.feature_weights["patch_weights"][idx] * patch_state_list[idx]
 
 		return util
 
@@ -41,10 +44,10 @@ class PatchworkAI():
 		
 		reward += button_gen
 
-		if won == 1:
-			reward += 100
-		elif won == -1:
-			reward -= 100
+		#if won == 1:
+		#	reward += 100
+		#elif won == -1:
+		#	reward -= 100
 
 		return reward
 
@@ -60,10 +63,18 @@ class PatchworkAI():
 		#U(S') is given as future_state_util (see get_state_utility())
 		#U(S) is given as curr_state_util
 		#xi is in patch_state_list[i]
-		for i in range(len(self.feature_weights)):
-			prev_weight = self.feature_weights[i]
-			updated_weight = prev_weight + ((self.LEARNING_RATE)*(state_reward + (((self.DISCOUNT_FACTOR)*future_state_util) - curr_state_util)))*patch_state_list[i]
-			self.feature_weights[i] = updated_weight
+		for key, value in self.feature_weights.items():
+			if key == "patch_weights":
+				temp_array = list(value)
+				for i in range(len(value)):
+					prev_weight = value[i]
+					updated_weight = prev_weight + ((self.LEARNING_RATE)*(state_reward + (((self.DISCOUNT_FACTOR)*future_state_util) - curr_state_util)))*patch_state_list[i]
+					temp_array[i] = updated_weight
+				self.feature_weights[key] = temp_array
+			else:
+				prev_weight = value
+				updated_weight = prev_weight + ((self.LEARNING_RATE)*(state_reward + (((self.DISCOUNT_FACTOR)*future_state_util) - curr_state_util)))*patch_state_list[i]
+				self.feature_weights[key] = updated_weight
 
 	def choose_turn_random(self, model):
 		turns = model.get_turns()
