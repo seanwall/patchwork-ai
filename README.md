@@ -1,6 +1,9 @@
 # patchwork-ai
 Patchwork model &amp; learned AI for CS 4150
 
+## Rules Overview
+https://boardgamegeek.com/boardgame/163412/patchwork
+
 ## Installation
 This program was built using Python 3.7
 
