@@ -10,14 +10,6 @@ class QuiltBoard():
 			self.board_array = board_array
 		self.pieces = []
 
-		#used for learning TODO: this is a dumb place for this
-		self.patch_counts = []
-
-		for i in range(34):
-			self.patch_counts.append(0)
-
-		#TODO ^^
-
 		self.button_gen = 0
 
 	def valid_placement(self, patch, row, col):
@@ -59,7 +51,6 @@ class QuiltBoard():
 			#update button gen for the board and the pieces list
 			self.button_gen += patch.button_gen
 			self.pieces.append(patch)
-			self.patch_counts[patch.id - 1] = self.patch_counts[patch.id - 1] + 1
 
 
 	def copy(self):

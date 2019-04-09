@@ -24,6 +24,28 @@ class Player():
 	#TODO might want to pass controller here so can dynamic dispatch back to player
 	#placement if patch tile is landed on?
 
+	#return 2 booleans, determining if the player will cross an econ or patch tile when moving the given distance
+	def will_pass_tile(self, distance, time_track):
+		if(self.position + distance >= len(time_track.track)):
+			distance = (len(time_track.track) - 1) - self.position
+			
+		passed_patch = False
+		passed_button_gen = False
+
+		for tile in range(distance):
+			#dont want 0 indexed
+			tile += 1
+			#update current player button count if it ever passes an income tile
+			if time_track.track[tile + self.position] == TrackTile.INCOME or time_track.track[tile + self.position] == TrackTile.END:
+				passed_button_gen = True
+
+			#update passed_patch value and remove the tile from the time_track 
+			if time_track.track[tile + self.position] == TrackTile.PATCH:
+				passed_patch = True
+
+		return passed_patch, passed_button_gen
+
+
 	def move(self, distance, time_track, other_player):
 		#check if player is entering final tile on this move and cap distance accordingly
 		if(self.position + distance >= len(time_track.track)):

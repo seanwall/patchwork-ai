@@ -5,53 +5,54 @@ from patchwork.model.Turn import JumpTurn
 from patchwork.model.Turn import BuyTurn
 from patchwork.model.Patch import Patch
 from patchwork.model.Player import Player
+from ai.Features import FeatureStateModel
+from ai.Features import FeatureWeights
 
 import random
 
 class PatchworkAI():
-	LEARNING_RATE = .01
-	DISCOUNT_FACTOR = .1
+	#LEARNING_RATE = .01
+	#DISCOUNT_FACTOR = .1
 
-	def __init__(self):
-		self.feature_weights = {}
-		self.initialize_weights()
+	#def __init__(self):
+		#self.feature_weights = {}
+		#self.initialize_weights()
 
 	#initialize feature weights to 0
 	def initialize_weights(self):
-		patch_weights = []
+		patch_weights_early = []
+		patch_weights_mid = []
+		patch_weights_late = []
 		for i in range(34):
-			patch_weights.append(float(0))
+			patch_weights_early.append(float(0))
+			patch_weights_mid.append(float(0))
+			patch_weights_late.append(float(0))
 
-		self.feature_weights["patch_weights"] = patch_weights
+		self.feature_weights["patch_weights_early"] = patch_weights_early
+		self.feature_weights["patch_weights_mid"] = patch_weights_mid
+		self.feature_weights["patch_weights_late"] = patch_weights_late
 
 	#initial state utility, weight for each patch multiplied by state (state being if the player purchased that patch or not)
 	#right now this will just learn a general value for each patch
 	#TODO, different feature state list than just a list of patch ids
-	def get_state_utility(self, patch_state_list):
-		util = 0
-		for idx in range(len(patch_state_list)):
-			#add the weight of the current patch to the state utility
-			util += self.feature_weights["patch_weights"][idx] * patch_state_list[idx]
+	#def get_state_utility(self, patch_state_list_early, patch_state_list_mid, patch_state_list_late):
+	#	util = 0
+		#if position < 25:
+	#	for idx in range(len(patch_state_list_early)):
+				#add the weight of the current patch to the state utility
+	#		util += self.feature_weights["patch_weights_early"][idx] * patch_state_list_early[idx]
 
-		return util
+		#elif position < 45:
+			#for idx in range(len(patch_state_list_mid)):
+	#		util += self.feature_weights["patch_weights_mid"][idx] * patch_state_list_mid[idx]
+		#else:
+			#for idx in range(len(patch_state_list_late)):
+	#		util += self.feature_weights["patch_weights_late"][idx] * patch_state_list_late[idx]
+
+	#	return util
 
 
-	#TODO: scale value for winning based on how much the final score was
-	def calculate_reward(self, passed_1x1, button_gen, won):
-		reward = 0
-		if passed_1x1:
-			reward += 5
-		
-		reward += button_gen
-
-		#if won == 1:
-		#	reward += 100
-		#elif won == -1:
-		#	reward -= 100
-
-		return reward
-
-	def update_feature_weights(self, state_reward, future_state_util, curr_state_util, patch_state_list):
+	#def update_feature_weights(self, state_reward, future_state_util, curr_state_util, patch_state_list_early, patch_state_list_mid, patch_state_list_late):
 
 		#update feature weights:
 		#wi = wi + a(r + y(U(S')-U(S))xi
@@ -63,18 +64,32 @@ class PatchworkAI():
 		#U(S') is given as future_state_util (see get_state_utility())
 		#U(S) is given as curr_state_util
 		#xi is in patch_state_list[i]
-		for key, value in self.feature_weights.items():
-			if key == "patch_weights":
-				temp_array = list(value)
-				for i in range(len(value)):
-					prev_weight = value[i]
-					updated_weight = prev_weight + ((self.LEARNING_RATE)*(state_reward + (((self.DISCOUNT_FACTOR)*future_state_util) - curr_state_util)))*patch_state_list[i]
-					temp_array[i] = updated_weight
-				self.feature_weights[key] = temp_array
-			else:
-				prev_weight = value
-				updated_weight = prev_weight + ((self.LEARNING_RATE)*(state_reward + (((self.DISCOUNT_FACTOR)*future_state_util) - curr_state_util)))*patch_state_list[i]
-				self.feature_weights[key] = updated_weight
+	#	for key, value in self.feature_weights.items():
+	#		if key == "patch_weights_early":
+	#			temp_array = list(value)
+	#			for i in range(len(value)):
+	#				prev_weight = value[i]
+	#				updated_weight = prev_weight + ((self.LEARNING_RATE)*(state_reward + (((self.DISCOUNT_FACTOR)*future_state_util) - curr_state_util)))*patch_state_list_early[i]
+	#				temp_array[i] = updated_weight
+	#			self.feature_weights[key] = temp_array
+	#		elif key == "patch_weights_mid":
+	#			temp_array = list(value)
+	#			for i in range(len(value)):
+	#				prev_weight = value[i]
+	#				updated_weight = prev_weight + ((self.LEARNING_RATE)*(state_reward + (((self.DISCOUNT_FACTOR)*future_state_util) - curr_state_util)))*patch_state_list_mid[i]
+	#				temp_array[i] = updated_weight
+	#			self.feature_weights[key] = temp_array
+	#		elif key == "patch_weights_late":
+	#			temp_array = list(value)
+	#			for i in range(len(value)):
+	#				prev_weight = value[i]
+	#				updated_weight = prev_weight + ((self.LEARNING_RATE)*(state_reward + (((self.DISCOUNT_FACTOR)*future_state_util) - curr_state_util)))*patch_state_list_late[i]
+	#				temp_array[i] = updated_weight
+	#			self.feature_weights[key] = temp_array
+			#else:
+			#	prev_weight = value
+			#	updated_weight = prev_weight + ((self.LEARNING_RATE)*(state_reward + (((self.DISCOUNT_FACTOR)*future_state_util) - curr_state_util)))*patch_state_list[i]
+			#	self.feature_weights[key] = updated_weight
 
 	def choose_turn_random(self, model):
 		turns = model.get_turns()
@@ -128,55 +143,66 @@ class PatchworkAI():
 		#	print(model.patch_list[best_turn.patch_idx].button_gen)
 		return best_turn
 
-	def choose_turn_learning(self, model, passed_patch, passed_econ):
-		if model.p1_turn():
-			player = model.p1
-		else:
-			player = model.p2
-
+	#finds the next available states from the current state_model, based on the given patchwork model
+	def find_future_states(self, model, state_model):
 		turns = model.get_turns()
-		best_turn = turns[0]
 
-		if not isinstance(best_turn, JumpTurn):
+		possible_future_states = []
 
-			best_patch_id = best_turn.patch_id
-			next_best_patch_state_list = list(player.quilt.patch_counts)
-			next_best_patch_state_list[best_patch_id] = next_best_patch_state_list[best_patch_id] + 1
-			#best next state util to compare against, if move is found with a higher next state util, choose that move
-			best_next_state_util = self.get_state_utility(next_best_patch_state_list)
+		#for each turn generate the future state associated with it
+		for i in range(len(turns)):
+			future_state = self.find_future_state(turns[i], state_model)
+			possible_future_states.append(future_state)
 
-			#check utility for each next state for each of the turns
-			for turn in turns:
-				if isinstance(turn, BuyTurn):
-					patch_id = turn.patch_id
+		return possible_future_states
 
-					next_patch_state_list = list(player.quilt.patch_counts)
+	#find the future state for the given turn
+	def find_future_state(self, turn, state_model):
+		future_patch_list_early = list(state_model.patch_list_early)
+		future_patch_list_mid = list(state_model.patch_list_mid)
+		future_patch_list_late = list(state_model.patch_list_late)
+		passed_patch = turn.passes_patch
+		passed_econ = turn.passes_econ
 
-					next_patch_state_list[patch_id] = next_patch_state_list[patch_id] + 1
+		if isinstance(turn, BuyTurn):
+			if state_model.player.position < 30:
+				future_patch_list_early[turn.patch_id] = future_patch_list_early[turn.patch_id] + 1
+			elif state_model.player.position < 60:
+				future_patch_list_mid[turn.patch_id] = future_patch_list_mid[turn.patch_id] + 1
+			else:
+				future_patch_list_late[turn.patch_id] = future_patch_list_late[turn.patch_id] + 1
 
-					next_state_util = self.get_state_utility(next_patch_state_list)
+		future_state = FeatureStateModel(state_model.player)
+		future_state.patch_list_early = future_patch_list_early
+		future_state.patch_list_mid = future_patch_list_mid
+		future_state.patch_list_late = future_patch_list_late
+		future_state.passed_patch = passed_patch
+		future_state.passed_econ = passed_econ
 
-					if next_state_util > best_next_state_util:
-						best_next_state_util = next_state_util
-						best_turn = turn
-
-			#once turn has been found, update weights
-			button_gen = 0
-			if passed_econ:
-				button_gen = player.quilt.button_gen
-			reward = self.calculate_reward(passed_patch, button_gen, False)
-		else:
-			next_best_patch_state_list = list(player.quilt.patch_counts)
-			best_next_state_util = self.get_state_utility(next_best_patch_state_list)
-			button_gen = 0
-			if passed_econ:
-				button_gen = player.quilt.button_gen
-			reward = self.calculate_reward(passed_patch, button_gen, False)
+		return future_state
 
 
-		self.update_feature_weights(reward, best_next_state_util, self.get_state_utility(player.quilt.patch_counts), player.quilt.patch_counts)
+	def find_next_best_util(self, state_models, feature_weights):
+		best_state_idx = 0
+		best_state_util = state_models[0].get_state_utility(feature_weights)
 
-		return best_turn
+		for i in range(len(state_models)):
+			if state_models[i].get_state_utility(feature_weights) > best_state_util:
+				best_state_idx = i
+				best_state_util = state_models[i].get_state_utility(feature_weights)
+
+		return best_state_idx, best_state_util
+
+	def choose_turn_learning(self, model, state_model, feature_weights):
+
+		possible_future_states = self.find_future_states(model, state_model)
+
+		turn_idx, best_util = self.find_next_best_util(possible_future_states, feature_weights)
+		reward = state_model.calculate_reward(0)
+
+		feature_weights.update_feature_weights(reward, best_util, state_model)
+
+		return model.get_turns()[turn_idx]
 
 	#Check if piece can be placed anywhere on the board
 	def can_place(self, patch, quilt):

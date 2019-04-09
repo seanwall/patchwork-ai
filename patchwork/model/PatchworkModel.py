@@ -109,9 +109,11 @@ class PatchworkModel():
 
 		for i in range(3):
 			if self.can_buy(i):
-				turns.append(BuyTurn(i, self.patch_list[i].id))
+				passes_patch, passes_econ = player.will_pass_tile(self.patch_list[i].time_cost, self.time_track)
+				turns.append(BuyTurn(i, self.patch_list[i].id, passes_patch, passes_econ))
 
-		turns.append(JumpTurn())
+		passes_patch, passes_econ = player.will_pass_tile(other_player.position - player.position + 1, self.time_track)
+		turns.append(JumpTurn(passes_patch, passes_econ))
 
 		return turns
 
