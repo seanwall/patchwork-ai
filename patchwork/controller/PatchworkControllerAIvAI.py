@@ -9,7 +9,7 @@ from patchwork.model.Turn import JumpTurn
 import sys
 
 class PatchworkControllerAIvAI():
-	INTERVAL_SIZE = 5
+	INTERVAL_SIZE = 1
 
 	def __init__(self):
 		self.model = PatchworkModel()
@@ -239,6 +239,7 @@ class PatchworkControllerAIvAI():
 
 					if self.model.p1_win() == 1:
 						p1_win_count += 1
+						p1_win += 1
 
 					p1_running_sum += self.model.p1.get_score()
 					p2_running_sum += self.model.p2.get_score()
@@ -295,18 +296,30 @@ class PatchworkControllerAIvAI():
 
 		print()
 
-		f = open("p1_progress.txt", "w")
-		print("GAME AVGS: ")
-		for i in range(len(p1_game_avgs)):
-			print(str(i*self.INTERVAL_SIZE) + " - " + str((i*self.INTERVAL_SIZE) + self.INTERVAL_SIZE) + " | Player 1: " + str(p1_game_avgs[i]) + ", Player 2: " + str(p2_game_avgs[i]) + ", Difference: " + str(p1_game_avgs[i] - p2_game_avgs[i]) + ", P1 Wins: " + str(p1_win_counts[i]) + ", P2 Wins: " + str(self.INTERVAL_SIZE - p1_win_counts[i]) + ", P1 Win %: " + str((p1_win_counts[i]/self.INTERVAL_SIZE)*100))
+		f1 = open("ai_button_gen.txt", "w")
+		f2 = open("ai_button_total.txt", "w")
+		f3 = open("ai_quilt_coverage.txt", "w")
+		f4 = open("ai_score.txt", "w")
+		f5 = open("ai_score_diff.txt", "w")
+		#print("GAME AVGS: ")
+		#for i in range(len(p1_game_avgs)):
+			#print(str(i*self.INTERVAL_SIZE) + " - " + str((i*self.INTERVAL_SIZE) + self.INTERVAL_SIZE) + " | Player 1: " + str(p1_game_avgs[i]) + ", Player 2: " + str(p2_game_avgs[i]) + ", Difference: " + str(p1_game_avgs[i] - p2_game_avgs[i]) + ", P1 Wins: " + str(p1_win_counts[i]) + ", P2 Wins: " + str(self.INTERVAL_SIZE - p1_win_counts[i]) + ", P1 Win %: " + str((p1_win_counts[i]/self.INTERVAL_SIZE)*100))
 			#f.write(str((p1_win_counts[i]/5)*100) + ", ")
 
-		print("AI TENDENCIES: ")
+		#print("AI TENDENCIES: ")
 		for i in range(len(p1_button_gen_sums)):
-			print(str(i*self.INTERVAL_SIZE) + " - " + str((i*self.INTERVAL_SIZE) + self.INTERVAL_SIZE) + " | Button Gen: " + str(p1_button_gen_sums[i]) + ", Buttons: " + str(p1_buttons_sums[i]) + ", Board Util: " + str(p1_board_util_sums[i]))
-			f.write(str(p1_button_gen_sums[i]) + ", ")
-		print()
+			#print(str(i*self.INTERVAL_SIZE) + " - " + str((i*self.INTERVAL_SIZE) + self.INTERVAL_SIZE) + " | Button Gen: " + str(p1_button_gen_sums[i]) + ", Buttons: " + str(p1_buttons_sums[i]) + ", Board Util: " + str(p1_board_util_sums[i]))
+			f1.write(str(p1_button_gen_sums[i]) + ", ")
+			f2.write(str(p1_buttons_sums[i]) + ", ")
+			f3.write(str(p1_board_util_sums[i]) + ", ")
+			f4.write(str(p1_game_avgs[i]) + ", ")
+			f5.write(str(p1_game_avgs[i] - p2_game_avgs[i]) + ", ")
+		#print()
 
-		for i in range(len(p2_button_gen_sums)):
-			print(str(i*self.INTERVAL_SIZE) + " - " + str((i*self.INTERVAL_SIZE) + self.INTERVAL_SIZE) + " | Button Gen: " + str(p2_button_gen_sums[i]) + ", Buttons: " + str(p2_buttons_sums[i]) + ", Board Util: " + str(p2_board_util_sums[i]))
-		f.close()
+		#for i in range(len(p2_button_gen_sums)):
+		#	print(str(i*self.INTERVAL_SIZE) + " - " + str((i*self.INTERVAL_SIZE) + self.INTERVAL_SIZE) + " | Button Gen: " + str(p2_button_gen_sums[i]) + ", Buttons: " + str(p2_buttons_sums[i]) + ", Board Util: " + str(p2_board_util_sums[i]))
+		f1.close()
+		f2.close()
+		f3.close()
+		f4.close()
+		f5.close()

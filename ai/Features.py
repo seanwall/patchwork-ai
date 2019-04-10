@@ -28,7 +28,7 @@ class FeatureWeights():
 			self.patch_weights_mid[i] = prev_weight + ((self.LEARNING_RATE)*(state_reward + (((self.DISCOUNT_FACTOR)*future_state_util) - curr_state_util)))*state_model.patch_list_mid[i]
 
 		for i in range(len(self.patch_weights_late)):
-			prev_weight = self.patch_weights_mid[i]
+			prev_weight = self.patch_weights_late[i]
 			curr_state_util = state_model.get_state_utility(self)
 			state_reward = state_model.calculate_reward(0)
 			self.patch_weights_late[i] = prev_weight + ((self.LEARNING_RATE)*(state_reward + (((self.DISCOUNT_FACTOR)*future_state_util) - curr_state_util)))*state_model.patch_list_late[i]
@@ -81,9 +81,9 @@ class FeatureStateModel():
 		
 		reward = self.player.quilt.button_gen
 
-		if won == 1:
-			reward += 100
-		elif won == -1:
-			reward -= 100
+		#if won == 1:
+		#	reward += 100
+		#elif won == -1:
+		#	reward -= 100
 
 		return reward

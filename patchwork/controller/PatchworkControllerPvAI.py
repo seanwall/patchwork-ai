@@ -93,9 +93,10 @@ class PatchworkControllerPvAI():
 									phase = MovePhase.PLACEPHASE
 							if event.key == pygame.K_TAB:
 								#check for 1x1 placement
-								if self.model.jump():
+								passed_patch, passed_econ = self.model.jump()
+								if passed_patch:
 									phase = MovePhase.SPECIAL_PLACEPHASE
-									selected_patch = Patch([[1]], 0, 0, 0)
+									selected_patch = Patch(34, [[1]], 0, 0, 0)
 
 						if phase == MovePhase.PLACEPHASE or phase == MovePhase.SPECIAL_PLACEPHASE:
 						#if phase == MovePhase.PLACEPHASE:
@@ -121,10 +122,10 @@ class PatchworkControllerPvAI():
 									if phase == MovePhase.PLACEPHASE:
 										#check for 1x1 placement
 										self.model.place_patch(player, self.model.patch_list[highlighted_patch_idx], selected_patch_row, selected_patch_col)
-										passed_patch = self.model.buy_patch(highlighted_patch_idx)
+										passed_patch, passed_econ = self.model.buy_patch(highlighted_patch_idx)
 										if passed_patch:
 											phase = MovePhase.SPECIAL_PLACEPHASE
-											selected_patch = Patch([[1]], 0, 0, 0)
+											selected_patch = Patch(34, [[1]], 0, 0, 0)
 										else:
 											phase = MovePhase.BUYPHASE
 									#else in special place phase, phase ends when piece is placed (dont need to buy)
@@ -141,19 +142,20 @@ class PatchworkControllerPvAI():
 					if event.type == pygame.QUIT:
 						self.running = False
 
-				turn = self.ai.choose_turn_random(self.model)
+				turn = self.ai.choose_turn_hand_craft(self.model)
 				if isinstance(turn, BuyTurn):
-
 					#TEMPORARY HANDLING FOR IF THE PIECE CANT BE PLACED, NEED NEW SOLUTION FOR THIS
 					if not self.ai.can_place(self.model.patch_list[turn.patch_idx], self.model.p2.quilt):
-						turn = JumpTurn()
+						passes_patch, passes_econ = player.will_pass_tile(other_player.position - player.position + 1, self.model.time_track)
+						turn = JumpTurn(passes_patch, passes_econ)
 					else:
 						row, col, patch_orientation = self.ai.choose_placement(self.model.patch_list[turn.patch_idx], self.model.p2.quilt)
 						self.model.place_patch(player, patch_orientation, row, col)
 				#place 1x1 patch
-				if turn.run(self.model):
-					row, col, patch_orientation = self.ai.choose_placement(Patch([[1]], 0, 0, 0), self.model.p2.quilt)
-					self.model.place_patch(player, Patch([[1]], 0, 0, 0), row, col)
+				passed_patch, passed_econ = turn.run(self.model, None)
+				if passed_patch:
+					row, col, patch_orientation = self.ai.choose_placement(Patch(34, [[1]], 0, 0, 0), self.model.p2.quilt)
+					self.model.place_patch(player, Patch(34, [[1]], 0, 0, 0), row, col)
 
 
 				#RENDERING
