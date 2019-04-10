@@ -4,6 +4,12 @@ Patchwork model &amp; learned AI for CS 4150
 ## Rules Overview
 https://boardgamegeek.com/boardgame/163412/patchwork
 
+## Project Structure
+
+All ai implementation is in the ai folder.
+
+PatchworkAI contains the overall controller for each AI (random, hand crafted, learned), while Features.py has the learning specific information: a model of the current state (as it is needed by the learner/feature weights), and a representation of the feature weights.
+
 ## Installation
 This program was built using Python 3.7
 
