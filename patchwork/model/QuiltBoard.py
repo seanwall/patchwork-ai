@@ -58,13 +58,13 @@ class QuiltBoard():
 		copy = QuiltBoard(board_array = board_copy)
 		return copy
 
-	#-2 for each open tile
+	#returns # tiles covered on the board
 	def calculate_board_coverage(self):
 		sum = 0
 		for row in range(len(self.board_array)):
 			for col in range(len(self.board_array[row])):
-				if self.board_array[row][col] == 0:
-					sum = sum - 2
+				if self.board_array[row][col] == 1:
+					sum += 1
 
 		return sum
 

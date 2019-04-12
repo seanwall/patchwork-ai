@@ -19,18 +19,18 @@ class PatchworkAI():
 		#self.initialize_weights()
 
 	#initialize feature weights to 0
-	def initialize_weights(self):
-		patch_weights_early = []
-		patch_weights_mid = []
-		patch_weights_late = []
-		for i in range(34):
-			patch_weights_early.append(float(0))
-			patch_weights_mid.append(float(0))
-			patch_weights_late.append(float(0))
+	#def initialize_weights(self):
+		#patch_weights_early = []
+		#patch_weights_mid = []
+		#patch_weights_late = []
+		#for i in range(34):
+		#	patch_weights_early.append(float(0))
+		#	patch_weights_mid.append(float(0))
+		#	patch_weights_late.append(float(0))
 
-		self.feature_weights["patch_weights_early"] = patch_weights_early
-		self.feature_weights["patch_weights_mid"] = patch_weights_mid
-		self.feature_weights["patch_weights_late"] = patch_weights_late
+		#self.feature_weights["patch_weights_early"] = patch_weights_early
+		#self.feature_weights["patch_weights_mid"] = patch_weights_mid
+		#self.feature_weights["patch_weights_late"] = patch_weights_late
 
 	#initial state utility, weight for each patch multiplied by state (state being if the player purchased that patch or not)
 	#right now this will just learn a general value for each patch
@@ -158,26 +158,23 @@ class PatchworkAI():
 
 	#find the future state for the given turn
 	def find_future_state(self, turn, state_model):
-		future_patch_list_early = list(state_model.patch_list_early)
-		future_patch_list_mid = list(state_model.patch_list_mid)
-		future_patch_list_late = list(state_model.patch_list_late)
-		passed_patch = turn.passes_patch
-		passed_econ = turn.passes_econ
-
 		if isinstance(turn, BuyTurn):
-			if state_model.player.position < 30:
-				future_patch_list_early[turn.patch_id] = future_patch_list_early[turn.patch_id] + 1
-			elif state_model.player.position < 60:
-				future_patch_list_mid[turn.patch_id] = future_patch_list_mid[turn.patch_id] + 1
-			else:
-				future_patch_list_late[turn.patch_id] = future_patch_list_late[turn.patch_id] + 1
+			patch_button_gen = turn.patch.button_gen
+			patch_cost = turn.patch.cost
+			patch_time_cost = turn.patch.time_cost
+			patch_coverage = turn.patch.get_area_coverage()
 
-		future_state = FeatureStateModel(state_model.player)
-		future_state.patch_list_early = future_patch_list_early
-		future_state.patch_list_mid = future_patch_list_mid
-		future_state.patch_list_late = future_patch_list_late
-		future_state.passed_patch = passed_patch
-		future_state.passed_econ = passed_econ
+			player_button_gen = state_model.player.quilt.button_gen + patch_button_gen
+			player_buttons = state_model.player.buttons - patch_cost
+			dist_to_player = (state_model.other_player.position - state_model.player.position) - patch_time_cost
+			board_coverage = state_model.player.quilt.calculate_board_coverage() + patch_coverage 
+		else:
+			player_button_gen = state_model.player.quilt.button_gen
+			player_buttons = state_model.player.buttons + (state_model.other_player.position - state_model.player.position + 1)
+			dist_to_player = -1
+			board_coverage = state_model.player.quilt.calculate_board_coverage()
+		
+		future_state = FeatureStateModel(state_model.player, state_model.other_player, player_button_gen, player_buttons, board_coverage, dist_to_player)
 
 		return future_state
 

@@ -9,14 +9,14 @@ from patchwork.model.Turn import JumpTurn
 import sys
 
 class PatchworkControllerAIvAI():
-	INTERVAL_SIZE = 1
+	INTERVAL_SIZE = 5
 
 	def __init__(self):
 		self.model = PatchworkModel()
 		self.ai = PatchworkAI()
 		self.feature_weights = FeatureWeights()
-		self.p1_feature_state = FeatureStateModel(self.model.p1)
-		self.p2_feature_state = FeatureStateModel(self.model.p2)
+		self.p1_feature_state = FeatureStateModel(self.model.p1, self.model.p2)
+		self.p2_feature_state = FeatureStateModel(self.model.p2, self.model.p1)
 		self.running = True
 
 	def mainloop(self, num_samples):
@@ -156,8 +156,8 @@ class PatchworkControllerAIvAI():
 			self.model = PatchworkModel()
 			self.running = True
 
-			self.p1_feature_state = FeatureStateModel(self.model.p1)
-			self.p2_feature_state = FeatureStateModel(self.model.p2)
+			self.p1_feature_state = FeatureStateModel(self.model.p1, self.model.p2)
+			self.p2_feature_state = FeatureStateModel(self.model.p2, self.model.p1)
 
 			while self.running:
 				if self.model.p1_turn():
@@ -177,11 +177,11 @@ class PatchworkControllerAIvAI():
 					turn = self.ai.choose_turn_random(self.model)
 
 					#update weights based on p2 moves as well
-					future_state = self.ai.find_future_state(turn, self.p2_feature_state)
+					#future_state = self.ai.find_future_state(turn, self.p2_feature_state)
 
-					reward = self.p2_feature_state.calculate_reward(0)
+					#reward = self.p2_feature_state.calculate_reward(0)
 
-					self.feature_weights.update_feature_weights(reward, future_state.get_state_utility(self.feature_weights), self.p2_feature_state)
+					#self.feature_weights.update_feature_weights(reward, future_state.get_state_utility(self.feature_weights), self.p2_feature_state)
 
 
 				#handling turn running
@@ -203,7 +203,6 @@ class PatchworkControllerAIvAI():
 
 				#if game is over, exit running loop and update p1_win counter
 				if self.model.game_over():
-
 					p1_rewards = self.p1_feature_state.calculate_reward(self.model.p1_win())
 					p2_rewards = self.p1_feature_state.calculate_reward(-1 * self.model.p1_win())
 
@@ -290,9 +289,12 @@ class PatchworkControllerAIvAI():
 
 		print()
 
-		print("PATCH WEIGHTS: ")
-		for i in range(len(self.feature_weights.patch_weights_early)):
-			print("Patch ID: " + str(i + 1) +", Early Weight: " + str(self.feature_weights.patch_weights_early[i]) + ", Mid Weight: " + str(self.feature_weights.patch_weights_mid[i]) + ", Late Weight: " + str(self.feature_weights.patch_weights_late[i]))
+		print("WEIGHTS: ")
+		print("Button Gen Weight: " + str(self.feature_weights.button_gen_weight))
+		print("Board Coverage Weight: " + str(self.feature_weights.board_coverage_weight))
+		print("Button Weight: " + str(self.feature_weights.buttons_weight))
+		print("Player Distance Weight: " + str(self.feature_weights.player_distance_weight))
+
 
 		print()
 
@@ -301,9 +303,9 @@ class PatchworkControllerAIvAI():
 		f3 = open("ai_quilt_coverage.txt", "w")
 		f4 = open("ai_score.txt", "w")
 		f5 = open("ai_score_diff.txt", "w")
-		#print("GAME AVGS: ")
-		#for i in range(len(p1_game_avgs)):
-			#print(str(i*self.INTERVAL_SIZE) + " - " + str((i*self.INTERVAL_SIZE) + self.INTERVAL_SIZE) + " | Player 1: " + str(p1_game_avgs[i]) + ", Player 2: " + str(p2_game_avgs[i]) + ", Difference: " + str(p1_game_avgs[i] - p2_game_avgs[i]) + ", P1 Wins: " + str(p1_win_counts[i]) + ", P2 Wins: " + str(self.INTERVAL_SIZE - p1_win_counts[i]) + ", P1 Win %: " + str((p1_win_counts[i]/self.INTERVAL_SIZE)*100))
+		print("GAME AVGS: ")
+		for i in range(len(p1_game_avgs)):
+			print(str(i*self.INTERVAL_SIZE) + " - " + str((i*self.INTERVAL_SIZE) + self.INTERVAL_SIZE) + " | Player 1: " + str(p1_game_avgs[i]) + ", Player 2: " + str(p2_game_avgs[i]) + ", Difference: " + str(p1_game_avgs[i] - p2_game_avgs[i]) + ", P1 Wins: " + str(p1_win_counts[i]) + ", P2 Wins: " + str(self.INTERVAL_SIZE - p1_win_counts[i]) + ", P1 Win %: " + str((p1_win_counts[i]/self.INTERVAL_SIZE)*100))
 			#f.write(str((p1_win_counts[i]/5)*100) + ", ")
 
 		#print("AI TENDENCIES: ")

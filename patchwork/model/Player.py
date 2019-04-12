@@ -126,7 +126,7 @@ class Player():
 		self.on_top = on_top
 
 	def get_score(self):
-		return self.buttons + self.quilt.calculate_board_coverage()
+		return self.buttons + ((81 - self.quilt.calculate_board_coverage()) * -2)
 
 	#TODO: THIS IS BAD, NEED BETTER VIEW HANDLING
 	def render_piece(self, surface, x, y):
