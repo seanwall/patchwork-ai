@@ -142,6 +142,7 @@ class PatchworkControllerAIvAI():
 		p1_button_gen_sums = []
 		p1_buttons_sums = []
 		p1_board_util_sums = []
+		p1_quilts =[]
 
 		p2_button_gen_sum = 0
 		p2_buttons_sum = 0
@@ -150,6 +151,15 @@ class PatchworkControllerAIvAI():
 		p2_button_gen_sums = []
 		p2_buttons_sums = []
 		p2_board_util_sums = []
+
+		p1_jump_ct = 0
+		p2_jump_ct = 0
+
+		p1_buy_ct = 0
+		p2_buy_ct = 0
+
+		p1_delayed_jump_ct = 0
+		p2_delayed_jump_ct = 0
 
 		for i in range(num_samples):
 			#reset the model for next game
@@ -177,19 +187,37 @@ class PatchworkControllerAIvAI():
 					turn = self.ai.choose_turn_random(self.model)
 
 					#update weights based on p2 moves as well
-					#future_state = self.ai.find_future_state(turn, self.p2_feature_state)
+					future_state = self.ai.find_future_state(turn, self.p2_feature_state)
 
-					#reward = self.p2_feature_state.calculate_reward(0)
+					reward = self.p2_feature_state.calculate_reward(turn.passes_player, turn.passes_econ, 0)
 
-					#self.feature_weights.update_feature_weights(reward, future_state.get_state_utility(self.feature_weights), self.p2_feature_state)
+					self.feature_weights.update_feature_weights(reward, future_state.get_state_utility(self.feature_weights), self.p2_feature_state)
 
+				if isinstance(turn, JumpTurn):
+				#DEBUGGING
+					if self.model.p1_turn():
+						p1_jump_ct += 1
+					else:
+						p2_jump_ct += 1
 
 				#handling turn running
 				if isinstance(turn, BuyTurn):
+					#DEBUGGING
+					if self.model.p1_turn():
+						p1_buy_ct += 1
+					else:
+						p2_buy_ct += 1
+
 					#check if it's possible for the player to place the selected patch
 					if not self.ai.can_place(self.model.patch_list[turn.patch_idx], player.quilt):
-						passes_patch, passes_econ = player.will_pass_tile(other_player.position - player.position + 1, self.model.time_track)
-						turn = JumpTurn(passes_patch, passes_econ)
+						passes_patch, passes_econ, passes_player = player.will_pass_tile(other_player.position - player.position + 1, self.model.time_track, other_player)
+						turn = JumpTurn(passes_patch, passes_econ, passes_player)
+						if self.model.p1_turn():
+							p1_buy_ct -=1
+							p1_delayed_jump_ct += 1
+						else:
+							p2_buy_ct -=1
+							p2_delayed_jump_ct += 1
 					else:
 						row, col, patch_orientation = self.ai.choose_placement(self.model.patch_list[turn.patch_idx], player.quilt)
 						self.model.place_patch(player, patch_orientation, row, col)
@@ -203,13 +231,14 @@ class PatchworkControllerAIvAI():
 
 				#if game is over, exit running loop and update p1_win counter
 				if self.model.game_over():
-					p1_rewards = self.p1_feature_state.calculate_reward(self.model.p1_win())
-					p2_rewards = self.p1_feature_state.calculate_reward(-1 * self.model.p1_win())
+					p1_rewards = self.p1_feature_state.calculate_reward(False, True, self.model.p1_win())
+					p2_rewards = self.p2_feature_state.calculate_reward(False, True, self.model.p1_win())
 
 					self.feature_weights.update_feature_weights(p1_rewards, self.p1_feature_state.get_state_utility(self.feature_weights), self.p1_feature_state)
 					self.feature_weights.update_feature_weights(p2_rewards, self.p2_feature_state.get_state_utility(self.feature_weights), self.p2_feature_state)
 
 
+					p1_quilts.append(self.model.p1.quilt.board_array)
 					#CALCULATING OUTPUTS FOR PROGRESS TRACKING
 					#keep track of p1/p2 end scores to calculate averages at end (hoping to see progress)
 					if ((i+1) % self.INTERVAL_SIZE) == 0:
@@ -250,6 +279,7 @@ class PatchworkControllerAIvAI():
 					p2_button_gen_sum += self.model.p2.quilt.button_gen
 					p2_buttons_sum += self.model.p2.buttons
 					p2_board_util_sum += self.ai.get_quilt_utility(self.model.p2.quilt)
+
 
 					#exit while loop, game is over
 					self.running = False
@@ -298,30 +328,46 @@ class PatchworkControllerAIvAI():
 
 		print()
 
-		f1 = open("ai_button_gen.txt", "w")
-		f2 = open("ai_button_total.txt", "w")
-		f3 = open("ai_quilt_coverage.txt", "w")
-		f4 = open("ai_score.txt", "w")
-		f5 = open("ai_score_diff.txt", "w")
+		#f1 = open("ai_button_gen.txt", "w")
+		#f2 = open("ai_button_total.txt", "w")
+		#f3 = open("ai_quilt_coverage.txt", "w")
+		#f4 = open("ai_score.txt", "w")
+		#f5 = open("ai_score_diff.txt", "w")
 		print("GAME AVGS: ")
 		for i in range(len(p1_game_avgs)):
 			print(str(i*self.INTERVAL_SIZE) + " - " + str((i*self.INTERVAL_SIZE) + self.INTERVAL_SIZE) + " | Player 1: " + str(p1_game_avgs[i]) + ", Player 2: " + str(p2_game_avgs[i]) + ", Difference: " + str(p1_game_avgs[i] - p2_game_avgs[i]) + ", P1 Wins: " + str(p1_win_counts[i]) + ", P2 Wins: " + str(self.INTERVAL_SIZE - p1_win_counts[i]) + ", P1 Win %: " + str((p1_win_counts[i]/self.INTERVAL_SIZE)*100))
 			#f.write(str((p1_win_counts[i]/5)*100) + ", ")
 
-		#print("AI TENDENCIES: ")
+		print("AI TENDENCIES: ")
+		print("P1 (LEARNED AI) FEATURE AVERAGES")
 		for i in range(len(p1_button_gen_sums)):
-			#print(str(i*self.INTERVAL_SIZE) + " - " + str((i*self.INTERVAL_SIZE) + self.INTERVAL_SIZE) + " | Button Gen: " + str(p1_button_gen_sums[i]) + ", Buttons: " + str(p1_buttons_sums[i]) + ", Board Util: " + str(p1_board_util_sums[i]))
-			f1.write(str(p1_button_gen_sums[i]) + ", ")
-			f2.write(str(p1_buttons_sums[i]) + ", ")
-			f3.write(str(p1_board_util_sums[i]) + ", ")
-			f4.write(str(p1_game_avgs[i]) + ", ")
-			f5.write(str(p1_game_avgs[i] - p2_game_avgs[i]) + ", ")
-		#print()
+			print(str(i*self.INTERVAL_SIZE) + " - " + str((i*self.INTERVAL_SIZE) + self.INTERVAL_SIZE) + " | Button Gen: " + str(p1_button_gen_sums[i]) + ", Buttons: " + str(p1_buttons_sums[i]) + ", Board Util: " + str(p1_board_util_sums[i]))
+			#f1.write(str(p1_button_gen_sums[i]) + ", ")
+			#f2.write(str(p1_buttons_sums[i]) + ", ")
+			#f3.write(str(p1_board_util_sums[i]) + ", ")
+			#f4.write(str(p1_game_avgs[i]) + ", ")
+			#f5.write(str(p1_game_avgs[i] - p2_game_avgs[i]) + ", ")
+		print()
 
-		#for i in range(len(p2_button_gen_sums)):
-		#	print(str(i*self.INTERVAL_SIZE) + " - " + str((i*self.INTERVAL_SIZE) + self.INTERVAL_SIZE) + " | Button Gen: " + str(p2_button_gen_sums[i]) + ", Buttons: " + str(p2_buttons_sums[i]) + ", Board Util: " + str(p2_board_util_sums[i]))
-		f1.close()
-		f2.close()
-		f3.close()
-		f4.close()
-		f5.close()
+		#print("QUILTS: ")
+		#for i in range(len(p1_quilts)):
+		#	print(str(i) + ":")
+		#	for row in range(len(p1_quilts[i])):
+		#		for col in range(len(p1_quilts[i][row])):
+		#			print(p1_quilts[i][row][col], end = "")
+		#		print()
+
+		#	print()
+		#	print()
+		print("P2 (RANDOM AI) FEATURE AVERAGES")
+		for i in range(len(p2_button_gen_sums)):
+			print(str(i*self.INTERVAL_SIZE) + " - " + str((i*self.INTERVAL_SIZE) + self.INTERVAL_SIZE) + " | Button Gen: " + str(p2_button_gen_sums[i]) + ", Buttons: " + str(p2_buttons_sums[i]) + ", Board Util: " + str(p2_board_util_sums[i]))
+		
+		#print("P1 jump ct: " + str(p1_jump_ct) + ", P2 jump ct: " + str(p2_jump_ct))
+		#print("P1 buy ct: " + str(p1_buy_ct) + ", P2 buy ct: " + str(p2_buy_ct))
+		#print("P1 delayed jump ct: " + str(p1_delayed_jump_ct) + ", P2 delayed jump ct: " + str(p2_delayed_jump_ct))
+		#f1.close()
+		#f2.close()
+		#f3.close()
+		#f4.close()
+		#f5.close()

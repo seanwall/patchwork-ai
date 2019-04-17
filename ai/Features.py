@@ -41,6 +41,12 @@ class PatchWeight():
 		util += self.time_cost_weight * patch.time_cost
 	
 class FeatureStateModel():
+	#scaled down significantly based on standard values - end game util for each of these features will end up being ~ 1 (hopefully)
+	BUTTON_GEN_SCALE = 15
+	COVERAGE_SCALE = 75
+	BUTTONS_SCALE = 35
+	DIST_SCALE = 2
+
 	def __init__(self, player, other_player, button_gen = None, buttons = None, board_coverage = None, dist_to_player = None):
 		#self.patch_list_early = []
 		#self.patch_list_mid = []
@@ -57,6 +63,8 @@ class FeatureStateModel():
 		#distance to other player
 		self.player = player
 		self.other_player = other_player
+
+		#values not based on player data for use in figuring out which future state is best
 		self.button_gen = None
 		self.buttons = None
 		self.board_coverage = None
@@ -84,34 +92,44 @@ class FeatureStateModel():
 	def get_state_utility(self, weights):
 		util = 0
 
+		#total = self.button_gen + self.board_coverage + self.buttons + self.dist_to_player
 
 		#constructed w/ necessary info for future states
+		#division is done to try and normalize all of these values to around the same scale
 		if self.button_gen is not None and self.buttons is not None and self.board_coverage is not None and self.dist_to_player is not None:
-			util += self.button_gen * weights.button_gen_weight
-			util += self.board_coverage/10 * weights.board_coverage_weight
-			util += self.buttons/3 * weights.buttons_weight
-			util += self.dist_to_player * weights.player_distance_weight
+			util += self.button_gen/self.BUTTON_GEN_SCALE * weights.button_gen_weight
+			util += self.board_coverage/self.COVERAGE_SCALE * weights.board_coverage_weight
+			util += self.buttons/self.BUTTONS_SCALE * weights.buttons_weight
+			util += self.dist_to_player/self.DIST_SCALE * weights.player_distance_weight
 		#going off of player info 
 		#TODO might not even need this i dunno
 		else:
-			util += self.player.quilt.button_gen * weights.button_gen_weight
-			util += self.player.quilt.calculate_board_coverage()/10 * weights.board_coverage_weight
-			util += self.player.buttons/3 * weights.buttons_weight
-			util += (self.other_player.position - self.player.position) * weights.player_distance_weight
+			util += self.player.quilt.button_gen/self.BUTTON_GEN_SCALE * weights.button_gen_weight
+			util += self.player.quilt.calculate_board_coverage()/self.COVERAGE_SCALE * weights.board_coverage_weight
+			util += self.player.buttons/self.BUTTONS_SCALE * weights.buttons_weight
+			util += (self.other_player.position - self.player.position)/self.DIST_SCALE * weights.player_distance_weight
 
 		return util
 
-	#TODO: scale value for winning based on how much the final score was
-	def calculate_reward(self, won):
+	#Rewards based on:
+	#picking a move that affords the player another move (positioned behind the opponent still)
+	#passing button gen (scaled based on button gen amount)
+	def calculate_reward(self, passes_player, passes_income, won):
 		#reward = 0
 		#if passed_1x1:
 			#reward += 2
-		
 		#reward = self.player.quilt.button_gen
 		reward = 0
-		if won == 1 or won == -1:
-			reward = self.player.get_score()
-		#elif won == -1:
-			#reward -= self.player.buttons
 
+		#small reward for not passing player (allows for ai to take multiple moves)
+		if not passes_player:
+			reward += 1
+
+		#reward for passing income that scales w/ the amount of income player has at the time
+		if passes_income:
+			reward += self.player.quilt.button_gen/5
+			#reward += self.player.quilt.calculate_board_coverage()/8
+		#reward on game end based on player score - even if a player wins if their board is crummy (negative score), discount current state
+		if won == 1 or won == -1:
+			reward += (self.player.get_score())
 		return reward

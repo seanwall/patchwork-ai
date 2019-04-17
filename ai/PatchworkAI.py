@@ -195,11 +195,14 @@ class PatchworkAI():
 		possible_future_states = self.find_future_states(model, state_model)
 
 		turn_idx, best_util = self.find_next_best_util(possible_future_states, feature_weights)
-		reward = state_model.calculate_reward(0)
+
+		turn = model.get_turns()[turn_idx]
+
+		reward = state_model.calculate_reward(turn.passes_player, turn.passes_econ, 0)
 
 		feature_weights.update_feature_weights(reward, best_util, state_model)
 
-		return model.get_turns()[turn_idx]
+		return turn
 
 	#Check if piece can be placed anywhere on the board
 	def can_place(self, patch, quilt):

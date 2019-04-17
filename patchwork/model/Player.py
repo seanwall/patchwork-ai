@@ -25,7 +25,7 @@ class Player():
 	#placement if patch tile is landed on?
 
 	#return 2 booleans, determining if the player will cross an econ or patch tile when moving the given distance
-	def will_pass_tile(self, distance, time_track):
+	def will_pass_tile(self, distance, time_track, other_player):
 		if(self.position + distance >= len(time_track.track)):
 			distance = (len(time_track.track) - 1) - self.position
 			
@@ -43,7 +43,9 @@ class Player():
 			if time_track.track[tile + self.position] == TrackTile.PATCH:
 				passed_patch = True
 
-		return passed_patch, passed_button_gen
+		passes_player = (self.position + distance) > other_player.position
+
+		return passed_patch, passed_button_gen, passes_player
 
 
 	def move(self, distance, time_track, other_player):
