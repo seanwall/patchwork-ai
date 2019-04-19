@@ -117,10 +117,10 @@ class PatchworkControllerPvP():
 								if phase == MovePhase.PLACEPHASE:
 									#check for 1x1 placement
 									self.model.place_patch(player, self.model.patch_list[highlighted_patch_idx], selected_patch_row, selected_patch_col)
-									passed_patch = self.model.buy_patch(highlighted_patch_idx)
+									passed_patch, passed_button_gen = self.model.buy_patch(highlighted_patch_idx)
 									if passed_patch:
 										phase = MovePhase.SPECIAL_PLACEPHASE
-										selected_patch = Patch([[1]], 0, 0, 0)
+										selected_patch = Patch(34,[[1]], 0, 0, 0)
 									else:
 										phase = MovePhase.BUYPHASE
 								#else in special place phase, phase ends when piece is placed (dont need to buy)
